@@ -1,0 +1,45 @@
+<!-- Barra de navegación compartida. Se inyecta vía js/layout.js -->
+<nav class="navbar navbar-expand-lg navbar-dark navbar-escom shadow-sm sticky-top" aria-label="Navegación principal">
+  <div class="container-fluid px-3 px-lg-4">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+      <img src="assets/logo-ipn.svg" alt="Logo IPN" height="38" class="brand-logo">
+      <img src="assets/logo-escom.svg" alt="Logo ESCOM" height="38" class="brand-logo">
+      <span class="brand-text d-none d-md-inline">Registro de Nuevo Ingreso</span>
+    </a>
+
+    <button class="navbar-toggler" type="button"
+            data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+            aria-controls="mainNavbar" aria-expanded="false"
+            aria-label="Alternar navegación">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="mainNavbar">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" data-nav="index" href="index.html">
+            <i class="bi bi-house-door me-1"></i>Inicio
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-nav="registro" href="registro.html">
+            <i class="bi bi-person-plus me-1"></i>Registro
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-nav="admin" href="admin.html">
+            <i class="bi bi-shield-lock me-1"></i>Admin
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-nav="cuenta" href="cuenta.html">
+            <i class="bi bi-person-circle me-1"></i>Cuenta
+          </a>
+        </li>
+      </ul>
+      <div class="ms-lg-3 d-flex align-items-center justify-content-center mt-3 mt-lg-0">
+        <img src="assets/logo-equipo.svg" alt="Logo del Equipo 9" height="42" class="brand-logo team-logo">
+      </div>
+    </div>
+  </div>
+</nav>

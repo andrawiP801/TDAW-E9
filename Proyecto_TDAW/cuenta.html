@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Acceso a la cuenta de alumno — Registro de Nuevo Ingreso ESCOM">
+  <title>Cuenta | Registro Nuevo Ingreso ESCOM</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="cuenta">
+
+  <header id="site-header"></header>
+
+  <main class="container">
+    <div class="auth-card shadow card border-0">
+      <div class="auth-header">
+        <i class="bi bi-person-circle fs-1"></i>
+        <h1 class="h4 mt-2 mb-0">Acceso a Cuenta</h1>
+        <p class="small mb-0 opacity-75">Aspirantes y alumnos ESCOM</p>
+      </div>
+      <div class="card-body p-4">
+        <form id="formCuenta">
+          <div class="mb-3">
+            <label for="cuentaUser" class="form-label">Boleta o correo institucional</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-person"></i></span>
+              <input type="text" class="form-control"
+                     id="cuentaUser" name="cuentaUser"
+                     placeholder="2024630123 ó usuario@alumno.ipn.mx" required>
+            </div>
+          </div>
+          <div class="mb-4">
+            <label for="cuentaPass" class="form-label">Contraseña</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-key"></i></span>
+              <input type="password" class="form-control"
+                     id="cuentaPass" name="cuentaPass"
+                     placeholder="••••••••" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-ipn w-100">
+            <i class="bi bi-box-arrow-in-right me-1"></i>Iniciar sesión
+          </button>
+          <p class="text-center mt-3 mb-0 small">
+            ¿Aún no te registras?
+            <a href="registro.html" class="link-primary">Crea tu cuenta aquí</a>
+          </p>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <footer id="site-footer"></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>
