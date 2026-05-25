@@ -19,12 +19,49 @@
     "Tabasco", "Tamaulipas", "Tlaxcala", "Veracruz", "Yucatán", "Zacatecas"
   ];
 
-  // CECyT 1 a 19 + CET 1 + "Otro".
-  const ESCUELAS_PROCEDENCIA = [
-    ...Array.from({ length: 19 }, (_, i) => `CECyT ${i + 1}`),
-    "CET 1",
-    "Otro"
+  // Las 16 alcaldías de la Ciudad de México.
+  const ALCALDIAS_CDMX = [
+    "Álvaro Obregón", "Azcapotzalco", "Benito Juárez", "Coyoacán",
+    "Cuajimalpa de Morelos", "Cuauhtémoc", "Gustavo A. Madero", "Iztacalco",
+    "Iztapalapa", "La Magdalena Contreras", "Miguel Hidalgo", "Milpa Alta",
+    "Tláhuac", "Tlalpan", "Venustiano Carranza", "Xochimilco"
   ];
+
+  // Catálogo de escuelas de procedencia: el value del <select> es la clave
+  // corta (CECyT 1, CET 1, Otro) y el label es el nombre oficial completo.
+  // Al elegir una opción específica se autocompleta nombreEscuela con el
+  // nombre completo (incluyendo el patronímico).
+  const ESCUELAS_PROCEDENCIA = [
+    { value: "CECyT 1",  nombre: 'CECyT 1 "Gonzalo Vázquez Vela"' },
+    { value: "CECyT 2",  nombre: 'CECyT 2 "Miguel Bernard"' },
+    { value: "CECyT 3",  nombre: 'CECyT 3 "Estanislao Ramírez Ruiz"' },
+    { value: "CECyT 4",  nombre: 'CECyT 4 "Lázaro Cárdenas"' },
+    { value: "CECyT 5",  nombre: 'CECyT 5 "Benito Juárez"' },
+    { value: "CECyT 6",  nombre: 'CECyT 6 "Miguel Othón de Mendizábal"' },
+    { value: "CECyT 7",  nombre: 'CECyT 7 "Cuauhtémoc"' },
+    { value: "CECyT 8",  nombre: 'CECyT 8 "Narciso Bassols García"' },
+    { value: "CECyT 9",  nombre: 'CECyT 9 "Juan de Dios Bátiz"' },
+    { value: "CECyT 10", nombre: 'CECyT 10 "Carlos Vallejo Márquez"' },
+    { value: "CECyT 11", nombre: 'CECyT 11 "Wilfrido Massieu Pérez"' },
+    { value: "CECyT 12", nombre: 'CECyT 12 "José María Morelos y Pavón"' },
+    { value: "CECyT 13", nombre: 'CECyT 13 "Ricardo Flores Magón"' },
+    { value: "CECyT 14", nombre: 'CECyT 14 "Luis Enrique Erro"' },
+    { value: "CECyT 15", nombre: 'CECyT 15 "Diódoro Antúnez Echegaray"' },
+    { value: "CECyT 16", nombre: 'CECyT 16 "Hidalgo"' },
+    { value: "CECyT 17", nombre: 'CECyT 17 "León, Guanajuato"' },
+    { value: "CECyT 18", nombre: 'CECyT 18 "Zacatecas"' },
+    { value: "CECyT 19", nombre: 'CECyT 19 "Leona Vicario"' },
+    { value: "CET 1",    nombre: 'CET 1 "Walter Cross Buchanan"' },
+    { value: "Otro",     nombre: "Otro" }
+  ];
+
+  // Rango de edad aceptado para ingreso a nivel superior.
+  const EDAD_MIN = 16;
+  const EDAD_MAX = 50;
+
+  // Promedio mínimo requerido (los reglamentos del IPN piden 7.0).
+  const PROMEDIO_MIN = 7.0;
+  const PROMEDIO_MAX = 10.0;
 
   // ---------------------------------------------------------------------------
   // Expresiones regulares (con comentario breve de la regla que codifican)
@@ -43,8 +80,9 @@
     // Teléfono: solo dígitos, hasta 10 caracteres.
     telefono: /^\d{1,10}$/,
 
-    // Promedio: 6.x a 9.x, o 10 / 10.0(+).
-    promedio: /^(?:10(?:\.0+)?|[6-9](?:\.\d+)?)$/,
+    // Promedio: 7.x a 9.x, o 10 / 10.0(+). El rango exacto se valida con
+    // PROMEDIO_MIN / PROMEDIO_MAX después de pasar este regex.
+    promedio: /^(?:10(?:\.0+)?|[7-9](?:\.\d+)?)$/,
 
     // Correo institucional: usuario@alumno.ipn.mx o usuario@ipn.mx.
     correo:   /^[A-Za-z0-9._%+-]+@(?:alumno\.)?ipn\.mx$/,
@@ -61,6 +99,7 @@
     genero:        "Género",
     curp:          "CURP",
     estado:        "Entidad federativa",
+    alcaldia:      "Alcaldía",
     telefono:      "Teléfono",
     escuela:       "Escuela de procedencia",
     nombreEscuela: "Nombre de la escuela",
@@ -74,8 +113,11 @@
   // ---------------------------------------------------------------------------
   document.addEventListener("DOMContentLoaded", () => {
     poblarSelect("estado", ESTADOS_MX);
+    poblarSelect("alcaldia", ALCALDIAS_CDMX);
     poblarSelect("escuela", ESCUELAS_PROCEDENCIA);
+    aplicarLimitesFechaNac();
     bindEscuelaToggle();
+    bindEstadoAlcaldia();
     bindReset();
     bindPasswordToggle();
     bindValidacionEnVivo();
@@ -85,15 +127,68 @@
   });
 
   // ---------------------------------------------------------------------------
-  // Llena dinámicamente un <select> con un arreglo de strings
+  // Llena dinámicamente un <select>.
+  // Acepta arreglo de strings o de objetos {value, nombre}.
   // ---------------------------------------------------------------------------
   function poblarSelect(id, opciones) {
     const select = document.getElementById(id);
-    opciones.forEach((valor) => {
+    opciones.forEach((item) => {
       const opt = document.createElement("option");
-      opt.value = valor;
-      opt.textContent = valor;
+      if (typeof item === "string") {
+        opt.value = item;
+        opt.textContent = item;
+      } else {
+        opt.value = item.value;
+        opt.textContent = item.nombre;
+      }
       select.appendChild(opt);
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // Calcula los atributos min/max del <input type="date"> de fecha de
+  // nacimiento a partir del rango de edad permitido. Así el navegador
+  // bloquea la selección de fechas fuera de rango además del JS.
+  // ---------------------------------------------------------------------------
+  function aplicarLimitesFechaNac() {
+    const input = document.getElementById("fechaNac");
+    const hoy = new Date();
+    const max = new Date(hoy.getFullYear() - EDAD_MIN, hoy.getMonth(), hoy.getDate());
+    const min = new Date(hoy.getFullYear() - EDAD_MAX, hoy.getMonth(), hoy.getDate());
+    input.max = max.toISOString().slice(0, 10);
+    input.min = min.toISOString().slice(0, 10);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Devuelve la edad (años cumplidos) a partir de una cadena yyyy-mm-dd.
+  // ---------------------------------------------------------------------------
+  function calcularEdad(fechaISO) {
+    const nac = new Date(fechaISO);
+    if (isNaN(nac.getTime())) return NaN;
+    const hoy = new Date();
+    let edad = hoy.getFullYear() - nac.getFullYear();
+    const m = hoy.getMonth() - nac.getMonth();
+    if (m < 0 || (m === 0 && hoy.getDate() < nac.getDate())) edad--;
+    return edad;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Habilita el combobox de alcaldía solo cuando el estado es CDMX.
+  // ---------------------------------------------------------------------------
+  function bindEstadoAlcaldia() {
+    const estado = document.getElementById("estado");
+    const alcaldia = document.getElementById("alcaldia");
+
+    estado.addEventListener("change", () => {
+      if (estado.value === "Ciudad de México") {
+        alcaldia.disabled = false;
+        alcaldia.required = true;
+      } else {
+        alcaldia.disabled = true;
+        alcaldia.required = false;
+        alcaldia.value = "";
+        alcaldia.classList.remove("is-invalid", "is-valid");
+      }
     });
   }
 
@@ -105,11 +200,25 @@
     const nombreEsc = document.getElementById("nombreEscuela");
 
     escuela.addEventListener("change", () => {
-      if (escuela.value === "Otro") {
+      const v = escuela.value;
+
+      if (v === "Otro") {
+        // Habilita y vacía el campo para que el usuario teclee.
         nombreEsc.disabled = false;
         nombreEsc.required = true;
+        nombreEsc.value = "";
+        nombreEsc.classList.remove("is-invalid", "is-valid");
         nombreEsc.focus();
+      } else if (v) {
+        // CECyT/CET específico: autocompleta con el nombre oficial completo
+        // y deja el campo deshabilitado (informativo).
+        const item = ESCUELAS_PROCEDENCIA.find((e) => e.value === v);
+        nombreEsc.value = item ? item.nombre : "";
+        nombreEsc.disabled = true;
+        nombreEsc.required = false;
+        nombreEsc.classList.remove("is-invalid", "is-valid");
       } else {
+        // Sin selección.
         nombreEsc.disabled = true;
         nombreEsc.required = false;
         nombreEsc.value = "";
@@ -132,6 +241,9 @@
         const nombreEsc = document.getElementById("nombreEscuela");
         nombreEsc.disabled = true;
         nombreEsc.required = false;
+        const alcaldia = document.getElementById("alcaldia");
+        alcaldia.disabled = true;
+        alcaldia.required = false;
       }, 0);
     });
   }
@@ -182,10 +294,20 @@
     } else if (id in REGEX) {
       valido = REGEX[id].test(valor);
 
-      // El promedio además debe estar en el rango exacto [6.0, 10.0].
+      // El promedio además debe estar en el rango [PROMEDIO_MIN, PROMEDIO_MAX].
       if (id === "promedio" && valido) {
         const n = parseFloat(valor);
-        valido = n >= 6.0 && n <= 10.0;
+        valido = n >= PROMEDIO_MIN && n <= PROMEDIO_MAX;
+      }
+    } else if (id === "fechaNac") {
+      // Coherencia para ingreso a nivel superior: edad en [EDAD_MIN, EDAD_MAX]
+      // y la fecha no puede ser futura.
+      const nac = new Date(valor);
+      if (isNaN(nac.getTime()) || nac > new Date()) {
+        valido = false;
+      } else {
+        const edad = calcularEdad(valor);
+        valido = edad >= EDAD_MIN && edad <= EDAD_MAX;
       }
     }
 
@@ -258,6 +380,8 @@
   // ---------------------------------------------------------------------------
   function recolectarDatos() {
     const get = (id) => document.getElementById(id).value.trim();
+    const nombreEsc = document.getElementById("nombreEscuela");
+    const alcaldia = document.getElementById("alcaldia");
     return {
       boleta:        get("boleta"),
       nombre:        get("nombre"),
@@ -265,11 +389,12 @@
       genero:        get("genero"),
       curp:          get("curp"),
       estado:        get("estado"),
+      alcaldia:      alcaldia.disabled ? "(no aplica)" : get("alcaldia"),
       telefono:      get("telefono"),
       escuela:       get("escuela"),
-      nombreEscuela: document.getElementById("nombreEscuela").disabled
-                      ? "(no aplica)"
-                      : get("nombreEscuela"),
+      // Cuando es Otro el usuario lo escribe; cuando es CECyT/CET el campo
+      // está deshabilitado pero contiene el nombre oficial autocompletado.
+      nombreEscuela: nombreEsc.value.trim() || "(no aplica)",
       promedio:      get("promedio"),
       correo:        get("correo"),
       password:      get("password")

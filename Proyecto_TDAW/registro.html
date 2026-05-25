@@ -64,7 +64,9 @@
             </label>
             <input type="date" class="form-control"
                    id="fechaNac" name="fechaNac" required>
-            <div class="invalid-feedback">Selecciona una fecha válida.</div>
+            <div class="invalid-feedback">
+              Debes tener entre 16 y 50 años para ingresar a nivel superior.
+            </div>
           </div>
 
           <div class="col-md-4">
@@ -102,6 +104,18 @@
               <!-- Las opciones se llenan dinámicamente en registro.js -->
             </select>
             <div class="invalid-feedback">Selecciona una entidad.</div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="alcaldia" class="form-label">
+              Alcaldía
+              <span class="text-muted small">(solo si la entidad es Ciudad de México)</span>
+            </label>
+            <select class="form-select" id="alcaldia" name="alcaldia" disabled>
+              <option value="">Selecciona una alcaldía…</option>
+              <!-- Las opciones (16 alcaldías de CDMX) se llenan en registro.js -->
+            </select>
+            <div class="invalid-feedback">Selecciona una alcaldía.</div>
           </div>
 
           <div class="col-md-6">
@@ -152,9 +166,9 @@
             </label>
             <input type="number" class="form-control"
                    id="promedio" name="promedio"
-                   step="0.01" min="6.0" max="10.0"
+                   step="0.01" min="7.0" max="10.0"
                    placeholder="8.5" required>
-            <div class="invalid-feedback">Debe ser un número entre 6.0 y 10.0.</div>
+            <div class="invalid-feedback">El promedio debe estar entre 7.0 y 10.0.</div>
           </div>
 
         </div>
