@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Sistema de registro de datos para alumnos de nuevo ingreso — ESCOM IPN">
+  <title>Inicio | Registro Nuevo Ingreso ESCOM</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="index">
+
+  <header id="site-header"></header>
+
+  <main>
+    <!-- ================== Carousel principal ================== -->
+    <section id="heroCarousel" class="carousel slide hero-carousel"
+             data-bs-ride="carousel" aria-label="Noticias y actividades de nuevo ingreso">
+      <div class="carousel-indicators">
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Diapositiva 1"></button>
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Diapositiva 2"></button>
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Diapositiva 3"></button>
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="3" aria-label="Diapositiva 4"></button>
+      </div>
+
+      <div class="carousel-inner">
+        <div class="carousel-item active" style="background: linear-gradient(135deg, #7a003c 0%, #003366 100%);">
+          <div class="container h-100 d-flex align-items-center justify-content-center text-center">
+            <div class="carousel-caption">
+              <h2 class="display-5 fw-bold">¡Bienvenidos a ESCOM!</h2>
+              <p class="lead">Inicia tu registro de datos generales y forma parte de la comunidad politécnica.</p>
+              <a href="registro.html" class="btn btn-light btn-lg mt-2">
+                <i class="bi bi-arrow-right-circle me-1"></i>Ir al registro
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="carousel-item" style="background: linear-gradient(135deg, #022950 0%, #1a4d80 100%);">
+          <div class="container h-100 d-flex align-items-center justify-content-center text-center">
+            <div class="carousel-caption">
+              <h2 class="display-5 fw-bold">Curso propedéutico</h2>
+              <p class="lead">Consulta los horarios y materiales del propedéutico para nuevo ingreso 2026.</p>
+              <a href="#noticias" class="btn btn-outline-light btn-lg mt-2">Más información</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="carousel-item" style="background: linear-gradient(135deg, #b9975b 0%, #7a003c 100%);">
+          <div class="container h-100 d-flex align-items-center justify-content-center text-center">
+            <div class="carousel-caption">
+              <h2 class="display-5 fw-bold">Talleres y actividades</h2>
+              <p class="lead">Inscríbete a las actividades de integración para nuevos politécnicos.</p>
+              <a href="#noticias" class="btn btn-outline-light btn-lg mt-2">Ver agenda</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="carousel-item" style="background: linear-gradient(135deg, #3c53b8 0%, hsl(343, 87%, 31%) 100%);">
+          <div class="container h-100 d-flex align-items-center justify-content-center text-center">
+            <div class="carousel-caption">
+              <h2 class="display-5 fw-bold">Gaceta Politécnia</h2>
+              <p class="lead">Consulta los horarios y materiales del propedéutico para nuevo ingreso 2026.</p>
+              <a href="gaceta.html" target="_blank" class="btn btn-outline-light btn-lg mt-2">Ver última noticia</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+
+      <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Anterior</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Siguiente</span>
+      </button>
+    </section>
+
+    <!-- ================== Tarjetas informativas ================== -->
+    <section id="noticias" class="container my-5">
+      <h2 class="mb-4 text-center" style="color: var(--escom-azul);">
+        Información para nuevo ingreso
+      </h2>
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="card h-100 shadow-sm border-0 hover-lift">
+            <div class="card-body text-center">
+              <i class="bi bi-clipboard-check fs-1" style="color: var(--ipn-guinda);"></i>
+              <h5 class="card-title mt-3">Registro de datos</h5>
+              <p class="card-text">
+                Captura tus datos personales, escolares y de cuenta para crear tu expediente en ESCOM.
+              </p>
+              <a href="registro.html" class="btn btn-ipn">
+                <i class="bi bi-pencil-square me-1"></i>Comenzar
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card h-100 shadow-sm border-0 hover-lift">
+            <div class="card-body text-center">
+              <i class="bi bi-mortarboard fs-1" style="color: var(--ipn-guinda);"></i>
+              <h5 class="card-title mt-3">Cursos propedéuticos</h5>
+              <p class="card-text">
+                Consulta horarios y materiales del propedéutico de nuevo ingreso.
+              </p>
+              <a href="propedeutico.html" class="btn btn-ipn">
+                <i class="bi bi-calendar me-1"></i>Ver horarios
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card h-100 shadow-sm border-0 hover-lift">
+            <div class="card-body text-center">
+              <i class="bi bi-people fs-1" style="color: var(--ipn-guinda);"></i>
+              <h5 class="card-title mt-3">Comunidad ESCOM</h5>
+              <p class="card-text">
+                Conoce los talleres, clubes y actividades culturales.
+              </p>
+              <a href="comunidad.html" class="btn btn-ipn">
+                <i class="bi bi-lightbulb me-1"></i>Explorar
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="site-footer"></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/layout.js"></script>
+</body>
+</html>

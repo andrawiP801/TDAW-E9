@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejercicio con VAl</title>
+    <script src="jquery-4.0.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#verDatos').click(function(event) {
+                var nombre = $('#nombre').val();
+                var email = $('#email').val();
+                alert('Nombre: ' + nombre + '\nEmail: ' + email);
+
+                $("#nombre").hide();
+                $("#labelNombre").hide();
+                $("#texto").text('¡Tu ejercicio es Correcto!');
+                $("#texto").css({
+                    "color": "blue",
+                    "text-decoration": "underline"
+                });
+
+                $("#email").val(" ");
+                $("#contrasenia").val('');
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Recupera datos con método val()</h1>
+    <form>
+        <label for="nombre" id="labelNombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre">
+        <p id="texto"></p>
+        
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email">
+        <br><br>
+        <label for="contrasenia">Contraseña:</label>
+        <input type="password" id="contrasenia" name="contrasenia">
+        <br><br>
+        <input type="button" id="verDatos" value="Ver Datos">
+    </form>
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Formulario de registro de datos generales — Nuevo Ingreso ESCOM">
+  <title>Registro | Nuevo Ingreso ESCOM</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="registro">
+
+  <header id="site-header"></header>
+
+  <main class="container my-4 my-md-5">
+
+    <div class="placeholder-banner mb-4 text-center">
+      <h1 class="h3 mb-2">
+        <i class="bi bi-person-plus-fill me-2"></i>Registro de Datos Generales
+      </h1>
+      <p class="mb-0">
+        Completa la siguiente información. Todos los campos son obligatorios salvo que se indique lo contrario.
+      </p>
+    </div>
+
+    <form id="formRegistro" novalidate>
+
+      <!-- ================== Sección 1: Datos personales ================== -->
+      <section class="form-section p-3 p-md-4">
+        <h2 class="h5 section-title">
+          <span class="section-number">1</span>Datos personales
+        </h2>
+        <div class="row g-3">
+
+          <div class="col-md-6">
+            <label for="boleta" class="form-label">
+              Número de boleta <span class="required-mark">*</span>
+            </label>
+            <input type="text" class="form-control text-uppercase"
+                   id="boleta" name="boleta" maxlength="10"
+                   placeholder="2024630123 ó PE08123456" required>
+            <div class="invalid-feedback">
+              Formato inválido. Use 10 dígitos numéricos, o PE/PP seguidos de 8 dígitos.
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="nombre" class="form-label">
+              Nombre completo <span class="required-mark">*</span>
+            </label>
+            <input type="text" class="form-control"
+                   id="nombre" name="nombre"
+                   placeholder="Juan Pérez García" required>
+            <div class="invalid-feedback">
+              Solo se permiten letras y espacios (mínimo 3 caracteres).
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <label for="fechaNac" class="form-label">
+              Fecha de nacimiento <span class="required-mark">*</span>
+            </label>
+            <input type="date" class="form-control"
+                   id="fechaNac" name="fechaNac" required>
+            <div class="invalid-feedback">
+              Debes tener entre 16 y 50 años para ingresar a nivel superior.
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <label for="genero" class="form-label">
+              Género <span class="required-mark">*</span>
+            </label>
+            <select class="form-select" id="genero" name="genero" required>
+              <option value="">Selecciona…</option>
+              <option value="Femenino">Femenino</option>
+              <option value="Masculino">Masculino</option>
+              <option value="Otro">Otro</option>
+              <option value="Prefiero no decir">Prefiero no decir</option>
+            </select>
+            <div class="invalid-feedback">Selecciona una opción.</div>
+          </div>
+
+          <div class="col-md-4">
+            <label for="curp" class="form-label">
+              CURP <span class="required-mark">*</span>
+            </label>
+            <input type="text" class="form-control text-uppercase"
+                   id="curp" name="curp" maxlength="18"
+                   placeholder="ABCD123456EFGHIJ12" required>
+            <div class="invalid-feedback">
+              CURP inválida. Debe tener 18 caracteres con formato oficial.
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="estado" class="form-label">
+              Entidad federativa de procedencia <span class="required-mark">*</span>
+            </label>
+            <select class="form-select" id="estado" name="estado" required>
+              <option value="">Selecciona un estado…</option>
+              <!-- Las opciones se llenan dinámicamente en registro.js -->
+            </select>
+            <div class="invalid-feedback">Selecciona una entidad.</div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="alcaldia" class="form-label">
+              Alcaldía
+              <span class="text-muted small">(solo si la entidad es Ciudad de México)</span>
+            </label>
+            <select class="form-select" id="alcaldia" name="alcaldia" disabled>
+              <option value="">Selecciona una alcaldía…</option>
+              <!-- Las opciones (16 alcaldías de CDMX) se llenan en registro.js -->
+            </select>
+            <div class="invalid-feedback">Selecciona una alcaldía.</div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="telefono" class="form-label">
+              Teléfono <span class="required-mark">*</span>
+            </label>
+            <input type="tel" class="form-control"
+                   id="telefono" name="telefono" maxlength="10"
+                   placeholder="5512345678" required>
+            <div class="invalid-feedback">Solo dígitos, máximo 10.</div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ================== Sección 2: Datos de procedencia ================== -->
+      <section class="form-section p-3 p-md-4">
+        <h2 class="h5 section-title">
+          <span class="section-number">2</span>Datos de procedencia
+        </h2>
+        <div class="row g-3">
+
+          <div class="col-md-6">
+            <label for="escuela" class="form-label">
+              Escuela de procedencia <span class="required-mark">*</span>
+            </label>
+            <select class="form-select" id="escuela" name="escuela" required>
+              <option value="">Selecciona…</option>
+              <!-- Las opciones (CECyT 1-19, CET 1, Otro) se llenan en registro.js -->
+            </select>
+            <div class="invalid-feedback">Selecciona una opción.</div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="nombreEscuela" class="form-label">
+              Nombre de la escuela
+              <span class="text-muted small">(solo si seleccionas "Otro")</span>
+            </label>
+            <input type="text" class="form-control"
+                   id="nombreEscuela" name="nombreEscuela"
+                   placeholder="Captura el nombre de la escuela" disabled>
+            <div class="invalid-feedback">Indica el nombre de la escuela.</div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="promedio" class="form-label">
+              Promedio <span class="required-mark">*</span>
+            </label>
+            <input type="number" class="form-control"
+                   id="promedio" name="promedio"
+                   step="0.01" min="7.0" max="10.0"
+                   placeholder="8.5" required>
+            <div class="invalid-feedback">El promedio debe estar entre 7.0 y 10.0.</div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ================== Sección 3: Datos de cuenta ================== -->
+      <section class="form-section p-3 p-md-4">
+        <h2 class="h5 section-title">
+          <span class="section-number">3</span>Datos de cuenta
+        </h2>
+        <div class="row g-3">
+
+          <div class="col-md-6">
+            <label for="correo" class="form-label">
+              Correo electrónico institucional <span class="required-mark">*</span>
+            </label>
+            <input type="email" class="form-control"
+                   id="correo" name="correo"
+                   placeholder="usuario@alumno.ipn.mx" required>
+            <div class="invalid-feedback">
+              Debe pertenecer al dominio <code>@alumno.ipn.mx</code> o <code>@ipn.mx</code>.
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="password" class="form-label">
+              Contraseña <span class="required-mark">*</span>
+            </label>
+            <div class="input-group">
+              <input type="password" class="form-control"
+                     id="password" name="password"
+                     placeholder="Mín. 6 caracteres" required>
+              <button class="btn btn-outline-secondary" type="button"
+                      id="togglePassword"
+                      aria-label="Mostrar u ocultar contraseña">
+                <i class="bi bi-eye"></i>
+              </button>
+              <div class="invalid-feedback">
+                Mínimo 6 caracteres, con al menos una mayúscula, un dígito y un carácter especial.
+              </div>
+            </div>
+            <small class="text-muted">Ejemplo válido: <code>Abc123!</code></small>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ================== Botones ================== -->
+      <div class="d-flex flex-column flex-md-row justify-content-end gap-2 mt-4">
+        <button type="reset" class="btn btn-outline-secondary" id="btnLimpiar">
+          <i class="bi bi-eraser me-1"></i>Limpiar
+        </button>
+        <button type="submit" class="btn btn-ipn px-4" id="btnRegistrar">
+          <i class="bi bi-check2-circle me-1"></i>Registrar
+        </button>
+      </div>
+    </form>
+  </main>
+
+  <!-- ================== Modal de confirmación ================== -->
+  <div class="modal fade" id="modalRevision" tabindex="-1"
+       aria-labelledby="modalRevisionLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header modal-ipn">
+          <h1 class="modal-title fs-5" id="modalRevisionLabel">
+            <i class="bi bi-clipboard-check me-2"></i>Confirmación de Registro
+          </h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <p class="lead" id="modalSaludo"></p>
+          <hr>
+          <dl class="row review-list" id="modalDatos"></dl>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            <i class="bi bi-pencil me-1"></i>Corregir datos
+          </button>
+          <button type="button" class="btn btn-ipn" id="btnConfirmar">
+            <i class="bi bi-check-lg me-1"></i>Confirmar registro
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer id="site-footer"></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/registro.js"></script>
+</body>
+</html>
