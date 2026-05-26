@@ -1,24 +1,32 @@
-<!-- Pie de página compartido. Se inyecta vía js/layout.js -->
+<!-- Pie de página compartido. -->
 <footer class="footer-escom mt-5 py-4">
-  <div class="container">
-    <div class="row align-items-center g-3">
-      <div class="col-md-4 text-center text-md-start">
-        <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-2">
-          <img src="./assets/logo-ipn.svg" alt="IPN" class="footer-logo">
-          <img src="./assets/EscudoESCOM.svg" alt="ESCOM" class="footer-logo">
-        </div>
-      </div>
-      <div class="col-md-4 text-center">
-        <p class="mb-0 fw-semibold">Instituto Politécnico Nacional</p>
-        <p class="mb-0 small">Escuela Superior de Cómputo</p>
-        <p class="mb-0 small">Tecnologias para el Desarrollo de Aplicaciones Web — Equipo 9</p>
-      </div>
-      <div class="col-md-4 text-center text-md-end">
-        <img src="./assets/logoEquipo.svg" alt="Logo del Equipo" class="footer-logo footer-team-logo">
-        <p class="mb-0 small mt-2">
-          &copy; <span id="footer-year"></span> — Todos los derechos reservados
-        </p>
-      </div>
+<div class="container">
+<div class="row align-items-center g-3">
+  <div class="col-md-4 text-center text-md-start">
+    <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-2">
+      <a href="https://www.ipn.mx" target="_blank" rel="noopener noreferrer">
+        <img src="./assets/logo-ipn.svg" alt="IPN" class="footer-logo">
+      </a>
+      <a href="https://www.escom.ipn.mx" target="_blank" rel="noopener noreferrer">
+        <img src="./assets/EscudoESCOM.svg" alt="ESCOM" class="footer-logo">
+      </a>
     </div>
   </div>
+  <div class="col-md-4 text-center">
+    <form method="post" action="index.html" class="m-0 p-0">
+      <button type="submit" class="btn btn-link p-0 m-0 fw-semibold text-decoration-none footer-text">
+        Instituto Politécnico Nacional
+      </button>
+    </form>
+    <p class="mb-0 small">Escuela Superior de Cómputo</p>
+    <p class="mb-0 small">Tecnologias para el Desarrollo de Aplicaciones Web — Equipo 9</p>
+  </div>
+  <div class="col-md-4 text-center text-md-end">
+    <img src="./assets/logoEquipo.svg" alt="Logo del Equipo" class="footer-logo footer-team-logo">
+    <p class="mb-0 small mt-2">
+      &copy; <span id="footer-year"></span> — Todos los derechos reservados
+    </p>
+  </div>
+</div>
+</div>
 </footer>

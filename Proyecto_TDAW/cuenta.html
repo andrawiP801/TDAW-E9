@@ -25,11 +25,15 @@
         <form id="formCuenta">
           <div class="mb-3">
             <label for="cuentaUser" class="form-label">Boleta o correo institucional</label>
-            <div class="input-group">
+            <div class="input-group has-validation">
               <span class="input-group-text"><i class="bi bi-person"></i></span>
               <input type="text" class="form-control"
                      id="cuentaUser" name="cuentaUser"
                      placeholder="2024630123 ó usuario@alumno.ipn.mx" required>
+              <div class="invalid-feedback">
+                Ingresa una boleta válida o un correo institucional
+                <code>@alumno.ipn.mx</code> / <code>@ipn.mx</code>.
+              </div>
             </div>
           </div>
           <div class="mb-4">
