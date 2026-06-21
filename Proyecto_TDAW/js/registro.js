@@ -1,15 +1,7 @@
-/* ============================================================================
-   registro.js — Validación del formulario de Registro de Nuevo Ingreso
-   Aplica expresiones regulares, feedback visual con clases Bootstrap
-   (.is-valid / .is-invalid) y muestra un modal de confirmación al enviar.
-   ============================================================================ */
 
 (function () {
   "use strict";
 
-  // ---------------------------------------------------------------------------
-  // Catálogos
-  // ---------------------------------------------------------------------------
   const ESTADOS_MX = [
     "Aguascalientes", "Baja California", "Baja California Sur", "Campeche",
     "Chiapas", "Chihuahua", "Ciudad de México", "Coahuila", "Colima", "Durango",
@@ -19,7 +11,6 @@
     "Tabasco", "Tamaulipas", "Tlaxcala", "Veracruz", "Yucatán", "Zacatecas"
   ];
 
-  // Las 16 alcaldías de la Ciudad de México.
   const ALCALDIAS_CDMX = [
     "Álvaro Obregón", "Azcapotzalco", "Benito Juárez", "Coyoacán",
     "Cuajimalpa de Morelos", "Cuauhtémoc", "Gustavo A. Madero", "Iztacalco",
@@ -27,10 +18,6 @@
     "Tláhuac", "Tlalpan", "Venustiano Carranza", "Xochimilco"
   ];
 
-  // Catálogo de escuelas de procedencia: el value del <select> es la clave
-  // corta (CECyT 1, CET 1, Otro) y el label es el nombre oficial completo.
-  // Al elegir una opción específica se autocompleta nombreEscuela con el
-  // nombre completo (incluyendo el patronímico).
   const ESCUELAS_PROCEDENCIA = [
     { value: "CECyT 1",  nombre: 'CECyT 1 "Gonzalo Vázquez Vela"' },
     { value: "CECyT 2",  nombre: 'CECyT 2 "Miguel Bernard"' },
@@ -55,43 +42,28 @@
     { value: "Otro",     nombre: "Otro" }
   ];
 
-  // Rango de edad aceptado para ingreso a nivel superior.
   const EDAD_MIN = 16;
   const EDAD_MAX = 50;
 
-  // Promedio mínimo requerido (los reglamentos del IPN piden 7.0).
   const PROMEDIO_MIN = 6.0;
   const PROMEDIO_MAX = 10.0;
 
-  // ---------------------------------------------------------------------------
-  // Expresiones regulares (con comentario breve de la regla que codifican)
-  // ---------------------------------------------------------------------------
   const REGEX = {
-    // Boleta: 10 dígitos (\d{10}) o PE/PP + 8 dígitos.
     boleta:   /^(\d{10}|(PE|PP)\d{8})$/,
 
-    // Nombre: letras (con acentos y ñ) y espacios; mínimo 3 caracteres.
     nombre:   /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]{3,}$/,
 
-    // CURP: 4 letras + 6 dígitos (fecha) + 6 letras (sexo + estado + consonantes)
-    //       + 2 alfanuméricos (homoclave). Total: 18.
     curp:     /^[A-Z]{4}\d{6}[A-Z]{6}[A-Z0-9]{2}$/,
 
-    // Teléfono: solo dígitos, hasta 10 caracteres.
     telefono: /^\d{1,10}$/,
 
-    // Promedio: 7.x a 9.x, o 10 / 10.0(+). El rango exacto se valida con
-    // PROMEDIO_MIN / PROMEDIO_MAX después de pasar este regex.
     promedio: /^(?:10(?:\.0+)?|[6-9](?:\.\d+)?)$/,
 
-    // Correo institucional: usuario@alumno.ipn.mx o usuario@ipn.mx.
     correo:   /^[A-Za-z0-9._%+-]+@(?:alumno\.)?ipn\.mx$/,
 
-    // Contraseña: ≥6 chars, ≥1 mayúscula, ≥1 dígito, ≥1 carácter especial.
     password: /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{6,}$/
   };
 
-  // Etiquetas legibles para el desglose en el modal.
   const LABELS = {
     boleta:        "Número de boleta",
     nombre:        "Nombre completo",
@@ -108,9 +80,6 @@
     password:      "Contraseña"
   };
 
-  // ---------------------------------------------------------------------------
-  // Inicialización
-  // ---------------------------------------------------------------------------
   document.addEventListener("DOMContentLoaded", () => {
     poblarSelect("estado", ESTADOS_MX);
     poblarSelect("alcaldia", ALCALDIAS_CDMX);
@@ -126,10 +95,6 @@
       .addEventListener("submit", onSubmit);
   });
 
-  // ---------------------------------------------------------------------------
-  // Llena dinámicamente un <select>.
-  // Acepta arreglo de strings o de objetos {value, nombre}.
-  // ---------------------------------------------------------------------------
   function poblarSelect(id, opciones) {
     const select = document.getElementById(id);
     opciones.forEach((item) => {
@@ -145,11 +110,6 @@
     });
   }
 
-  // ---------------------------------------------------------------------------
-  // Calcula los atributos min/max del <input type="date"> de fecha de
-  // nacimiento a partir del rango de edad permitido. Así el navegador
-  // bloquea la selección de fechas fuera de rango además del JS.
-  // ---------------------------------------------------------------------------
   function aplicarLimitesFechaNac() {
     const input = document.getElementById("fechaNac");
     const hoy = new Date();
@@ -159,9 +119,6 @@
     input.min = min.toISOString().slice(0, 10);
   }
 
-  // ---------------------------------------------------------------------------
-  // Devuelve la edad (años cumplidos) a partir de una cadena yyyy-mm-dd.
-  // ---------------------------------------------------------------------------
   function calcularEdad(fechaISO) {
     const nac = new Date(fechaISO);
     if (isNaN(nac.getTime())) return NaN;
@@ -172,9 +129,6 @@
     return edad;
   }
 
-  // ---------------------------------------------------------------------------
-  // Habilita el combobox de alcaldía solo cuando el estado es CDMX.
-  // ---------------------------------------------------------------------------
   function bindEstadoAlcaldia() {
     const estado = document.getElementById("estado");
     const alcaldia = document.getElementById("alcaldia");
@@ -192,9 +146,6 @@
     });
   }
 
-  // ---------------------------------------------------------------------------
-  // Habilita / deshabilita el campo "Nombre de la escuela" cuando se elige "Otro"
-  // ---------------------------------------------------------------------------
   function bindEscuelaToggle() {
     const escuela = document.getElementById("escuela");
     const nombreEsc = document.getElementById("nombreEscuela");
@@ -203,7 +154,6 @@
       const v = escuela.value;
 
       if (v === "Otro") {
-        // Habilita y vacía el campo para que el usuario teclee.
         nombreEsc.disabled = false;
         nombreEsc.required = true;
         nombreEsc.value = "";
@@ -216,7 +166,6 @@
         nombreEsc.required = false;
         nombreEsc.classList.remove("is-invalid", "is-valid");
       } else {
-        // Sin selección.
         nombreEsc.disabled = true;
         nombreEsc.required = false;
         nombreEsc.value = "";
@@ -225,13 +174,9 @@
     });
   }
 
-  // ---------------------------------------------------------------------------
-  // Botón "Limpiar": resetea estados visuales además del reset nativo
-  // ---------------------------------------------------------------------------
   function bindReset() {
     const form = document.getElementById("formRegistro");
     form.addEventListener("reset", () => {
-      // El reset es síncrono pero las clases se quitan después
       setTimeout(() => {
         form.querySelectorAll(".is-invalid, .is-valid").forEach((el) =>
           el.classList.remove("is-invalid", "is-valid")
@@ -246,9 +191,6 @@
     });
   }
 
-  // ---------------------------------------------------------------------------
-  // Toggle de visibilidad de la contraseña
-  // ---------------------------------------------------------------------------
   function bindPasswordToggle() {
     const btn = document.getElementById("togglePassword");
     const input = document.getElementById("password");
@@ -259,9 +201,6 @@
     });
   }
 
-  // ---------------------------------------------------------------------------
-  // Validación en vivo: al perder el foco de cada campo
-  // ---------------------------------------------------------------------------
   function bindValidacionEnVivo() {
     Object.keys(LABELS).forEach((id) => {
       const el = document.getElementById(id);
@@ -270,15 +209,11 @@
     });
   }
 
-  // ---------------------------------------------------------------------------
-  // Valida un campo y aplica clases Bootstrap. Devuelve true si es válido.
-  // ---------------------------------------------------------------------------
   function validarCampo(id) {
     const el = document.getElementById(id);
     if (!el) return true;
-    if (el.disabled) return true; // no se evalúa si está deshabilitado
+    if (el.disabled) return true;
 
-    // Normaliza a mayúsculas algunos campos.
     if (id === "boleta" || id === "curp") {
       el.value = el.value.toUpperCase().trim();
     }
@@ -286,7 +221,6 @@
     const valor = (el.value || "").trim();
     let valido = true;
 
-    // Campo vacío
     if (!valor) {
       valido = !el.required;
     } else if (id in REGEX) {
@@ -311,9 +245,6 @@
     return valido;
   }
 
-  // ---------------------------------------------------------------------------
-  // Manejo del envío del formulario
-  // ---------------------------------------------------------------------------
   function onSubmit(e) {
     e.preventDefault();
 
@@ -333,9 +264,6 @@
     mostrarModalRevision();
   }
 
-  // ---------------------------------------------------------------------------
-  // Construye y muestra el modal con todos los datos capturados
-  // ---------------------------------------------------------------------------
   function mostrarModalRevision() {
     const datos = recolectarDatos();
     const saludo = document.getElementById("modalSaludo");
@@ -363,16 +291,12 @@
 
     document.getElementById("btnConfirmar").onclick = () => {
       modal.hide();
-      // En una versión con backend, aquí se enviarían los datos al servidor.
       alert("¡Registro confirmado correctamente!");
       const form = document.getElementById("formRegistro");
       form.reset();
     };
   }
 
-  // ---------------------------------------------------------------------------
-  // Recolecta los valores actuales del formulario en un objeto plano
-  // ---------------------------------------------------------------------------
   function recolectarDatos() {
     const get = (id) => document.getElementById(id).value.trim();
     const nombreEsc = document.getElementById("nombreEscuela");

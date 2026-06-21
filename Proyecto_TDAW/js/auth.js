@@ -1,7 +1,3 @@
-/* ============================================================================
-   auth.js — Manejo básico de los formularios de login (admin y cuenta).
-   La validación de "no vacío" la realiza el atributo `required` de HTML5.
-   ============================================================================ */
 
 document.addEventListener("DOMContentLoaded", () => {
   ["formAdmin", "formCuenta"].forEach((id) => {
