@@ -60,7 +60,7 @@
   const EDAD_MAX = 50;
 
   // Promedio mínimo requerido (los reglamentos del IPN piden 7.0).
-  const PROMEDIO_MIN = 7.0;
+  const PROMEDIO_MIN = 6.0;
   const PROMEDIO_MAX = 10.0;
 
   // ---------------------------------------------------------------------------
@@ -82,7 +82,7 @@
 
     // Promedio: 7.x a 9.x, o 10 / 10.0(+). El rango exacto se valida con
     // PROMEDIO_MIN / PROMEDIO_MAX después de pasar este regex.
-    promedio: /^(?:10(?:\.0+)?|[7-9](?:\.\d+)?)$/,
+    promedio: /^(?:10(?:\.0+)?|[6-9](?:\.\d+)?)$/,
 
     // Correo institucional: usuario@alumno.ipn.mx o usuario@ipn.mx.
     correo:   /^[A-Za-z0-9._%+-]+@(?:alumno\.)?ipn\.mx$/,
@@ -210,8 +210,6 @@
         nombreEsc.classList.remove("is-invalid", "is-valid");
         nombreEsc.focus();
       } else if (v) {
-        // CECyT/CET específico: autocompleta con el nombre oficial completo
-        // y deja el campo deshabilitado (informativo).
         const item = ESCUELAS_PROCEDENCIA.find((e) => e.value === v);
         nombreEsc.value = item ? item.nombre : "";
         nombreEsc.disabled = true;
@@ -294,14 +292,11 @@
     } else if (id in REGEX) {
       valido = REGEX[id].test(valor);
 
-      // El promedio además debe estar en el rango [PROMEDIO_MIN, PROMEDIO_MAX].
       if (id === "promedio" && valido) {
         const n = parseFloat(valor);
         valido = n >= PROMEDIO_MIN && n <= PROMEDIO_MAX;
       }
     } else if (id === "fechaNac") {
-      // Coherencia para ingreso a nivel superior: edad en [EDAD_MIN, EDAD_MAX]
-      // y la fecha no puede ser futura.
       const nac = new Date(valor);
       if (isNaN(nac.getTime()) || nac > new Date()) {
         valido = false;
@@ -392,8 +387,6 @@
       alcaldia:      alcaldia.disabled ? "(no aplica)" : get("alcaldia"),
       telefono:      get("telefono"),
       escuela:       get("escuela"),
-      // Cuando es Otro el usuario lo escribe; cuando es CECyT/CET el campo
-      // está deshabilitado pero contiene el nombre oficial autocompletado.
       nombreEscuela: nombreEsc.value.trim() || "(no aplica)",
       promedio:      get("promedio"),
       correo:        get("correo"),
