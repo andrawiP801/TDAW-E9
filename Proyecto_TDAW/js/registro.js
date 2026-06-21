@@ -311,14 +311,84 @@
     });
 
     const modal = new bootstrap.Modal(document.getElementById("modalRevision"));
+    const btnConfirmar = document.getElementById("btnConfirmar");
+    const btnImprimir = document.getElementById("btnImprimirAcuse");
+    const btnCorregir = document.getElementById("btnCorregir");
+
+    btnConfirmar.classList.remove("d-none");
+    btnConfirmar.disabled = false;
+    btnImprimir.classList.add("d-none");
+    btnImprimir.disabled = true;
+
     modal.show();
 
-    document.getElementById("btnConfirmar").onclick = () => {
-      modal.hide();
-      alert("¡Registro confirmado correctamente!");
-      const form = document.getElementById("formRegistro");
-      form.reset();
+    btnConfirmar.onclick = () => {
+      btnConfirmar.disabled = true;
+
+      // ============================================================
+      // BLOQUE FETCH REAL — descomentar cuando el backend PHP esté listo
+      // ============================================================
+      // fetch("api/registrar_alumno.php", {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify(datos),
+      // })
+      //   .then((res) => res.json())
+      //   .then((data) => {
+      //     if (data.ok) {
+      //       alert("¡Datos guardados correctamente!");
+      //       btnConfirmar.classList.add("d-none");
+      //       btnImprimir.classList.remove("d-none");
+      //       btnImprimir.disabled = false;
+      //       btnImprimir.focus();
+      //     } else {
+      //       alert("Error del servidor: " + (data.mensaje || "desconocido"));
+      //       btnConfirmar.disabled = false;
+      //     }
+      //   })
+      //   .catch((err) => {
+      //     alert("Error de red: " + err.message);
+      //     btnConfirmar.disabled = false;
+      //   });
+
+      // ===== Simulación AJAX (mock local, sin tocar red) =====
+      Promise.resolve({
+        ok: true,
+        fecha: "2026-08-24",
+        mensaje: "Registro recibido correctamente",
+        payload: datos,
+      })
+        .then((data) => {
+          if (!data.ok) throw new Error(data.mensaje);
+          alert("¡Datos guardados correctamente!");
+          btnConfirmar.classList.add("d-none");
+          btnImprimir.classList.remove("d-none");
+          btnImprimir.disabled = false;
+          btnImprimir.focus();
+        })
+        .catch((err) => {
+          alert("Error: " + err.message);
+          btnConfirmar.disabled = false;
+        });
     };
+
+    btnImprimir.onclick = () => {
+      window.print();
+    };
+
+    const modalEl = document.getElementById("modalRevision");
+    const onHidden = () => {
+      const exitoso = btnConfirmar.classList.contains("d-none");
+      if (exitoso) {
+        document.getElementById("formRegistro").reset();
+      }
+      btnImprimir.classList.add("d-none");
+      btnImprimir.disabled = true;
+      btnConfirmar.classList.remove("d-none");
+      btnConfirmar.disabled = false;
+      modalEl.removeEventListener("hidden.bs.modal", onHidden);
+    };
+    modalEl.addEventListener("hidden.bs.modal", onHidden);
   }
 
   function recolectarDatos() {

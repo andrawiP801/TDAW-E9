@@ -14,47 +14,126 @@
 
   <header id="site-header"></header>
 
-  <main class="container">
-    <div class="auth-card shadow card border-0">
-      <div class="auth-header">
-        <i class="bi bi-person-circle fs-1"></i>
-        <h1 class="h4 mt-2 mb-0">Acceso a Cuenta</h1>
-        <p class="small mb-0 opacity-75">Aspirantes y alumnos ESCOM</p>
-      </div>
-      <div class="card-body p-4">
-        <form id="formCuenta">
-          <div class="mb-3">
-            <label for="cuentaUser" class="form-label">Boleta o correo institucional</label>
-            <div class="input-group has-validation">
-              <span class="input-group-text"><i class="bi bi-person"></i></span>
-              <input type="text" class="form-control"
-                     id="cuentaUser" name="cuentaUser"
-                     placeholder="2024630123 ó usuario@alumno.ipn.mx" required>
-              <div class="invalid-feedback">
-                Ingresa una boleta válida o un correo institucional
-                <code>@alumno.ipn.mx</code> / <code>@ipn.mx</code>.
+  <main class="container my-4 my-md-5">
+
+    <!-- ================== Panel de Login ================== -->
+    <section id="panelLoginCuenta">
+      <div class="auth-card shadow card border-0">
+        <div class="auth-header">
+          <i class="bi bi-person-circle fs-1"></i>
+          <h1 class="h4 mt-2 mb-0">Acceso a Cuenta</h1>
+          <p class="small mb-0 opacity-75">Aspirantes y alumnos ESCOM</p>
+        </div>
+        <div class="card-body p-4">
+          <form id="formCuenta" novalidate>
+            <div class="mb-3">
+              <label for="cuentaUser" class="form-label">Boleta o correo institucional</label>
+              <div class="input-group has-validation">
+                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                <input type="text" class="form-control"
+                       id="cuentaUser" name="cuentaUser"
+                       placeholder="2024630123 ó usuario@alumno.ipn.mx" required>
+                <div class="invalid-feedback">
+                  Ingresa una boleta válida o un correo institucional
+                  <code>@alumno.ipn.mx</code> / <code>@ipn.mx</code>.
+                </div>
               </div>
             </div>
-          </div>
-          <div class="mb-4">
-            <label for="cuentaPass" class="form-label">Contraseña</label>
-            <div class="input-group">
-              <span class="input-group-text"><i class="bi bi-key"></i></span>
-              <input type="password" class="form-control"
-                     id="cuentaPass" name="cuentaPass"
-                     placeholder="••••••••" required>
+
+            <div class="mb-3">
+              <label for="cuentaPass" class="form-label">Contraseña</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-key"></i></span>
+                <input type="password" class="form-control"
+                       id="cuentaPass" name="cuentaPass"
+                       placeholder="••••••••" required>
+              </div>
             </div>
-          </div>
-          <button type="submit" class="btn btn-ipn w-100">
-            <i class="bi bi-box-arrow-in-right me-1"></i>Iniciar sesión
-          </button>
-          <p class="text-center mt-3 mb-0 small">
-            ¿Aún no te registras?
-            <a href="registro.html" class="link-primary">Crea tu cuenta aquí</a>
-          </p>
-        </form>
+
+            <!-- ============== Bloque CAPTCHA ============== -->
+            <div class="mb-4">
+              <label for="captchaInputCuenta" class="form-label">
+                Verificación de seguridad
+              </label>
+              <div class="input-group">
+                <span class="input-group-text" id="captchaCuenta" aria-live="polite">
+                  <i class="bi bi-shield-check me-2"></i>
+                  <span class="fw-bold" id="captchaPreguntaCuenta">5 + 3 = ?</span>
+                </span>
+                <input type="text" class="form-control"
+                       id="captchaInputCuenta" name="captchaInputCuenta"
+                       inputmode="numeric" autocomplete="off"
+                       placeholder="Resultado" required>
+                <button class="btn btn-outline-secondary" type="button"
+                        id="btnRefreshCaptchaCuenta"
+                        aria-label="Generar nuevo CAPTCHA">
+                  <i class="bi bi-arrow-clockwise"></i>
+                </button>
+                <div class="invalid-feedback">
+                  El resultado debe ser numérico y coincidir con la operación mostrada.
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-ipn w-100">
+              <i class="bi bi-box-arrow-in-right me-1"></i>Iniciar sesión
+            </button>
+            <p class="text-center mt-3 mb-0 small">
+              ¿Aún no te registras?
+              <a href="registro.html" class="link-primary">Crea tu cuenta aquí</a>
+            </p>
+          </form>
+        </div>
       </div>
-    </div>
+    </section>
+
+    <!-- ================== Vista de Examen Restringida ================== -->
+    <section id="vistaExamen" class="d-none">
+      <div class="card hover-lift shadow border-0 mx-auto my-4" style="max-width: 720px;">
+        <div class="auth-header">
+          <i class="bi bi-clipboard2-check fs-1"></i>
+          <h1 class="h4 mt-2 mb-0">Acuse de Examen Diagnóstico</h1>
+          <p class="small mb-0 opacity-75">Programa Propedéutico ESCOM 2026</p>
+        </div>
+        <div class="card-body p-4 p-md-5">
+          <p class="lead mb-4">
+            ¡Bienvenido(a), <span id="examenNombre" class="fw-bold">aspirante</span>!
+            Estos son los datos de tu examen diagnóstico. Se recomienda llegar
+            <strong>20 minutos antes</strong> con identificación oficial.
+          </p>
+
+          <dl class="row review-list mb-4">
+            <dt class="col-sm-4"><i class="bi bi-calendar-event me-1"></i>Fecha</dt>
+            <dd class="col-sm-8">24 de agosto de 2026</dd>
+
+            <dt class="col-sm-4"><i class="bi bi-clock me-1"></i>Horario</dt>
+            <dd class="col-sm-8">11:00 — 12:30 hrs (Turno 1)</dd>
+
+            <dt class="col-sm-4"><i class="bi bi-geo-alt me-1"></i>Laboratorio</dt>
+            <dd class="col-sm-8">Laboratorio 3 — Edificio de Cómputo, ESCOM</dd>
+
+            <dt class="col-sm-4"><i class="bi bi-person-badge me-1"></i>Boleta</dt>
+            <dd class="col-sm-8"><span id="examenBoleta">—</span></dd>
+          </dl>
+
+          <div class="alert alert-warning small mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle me-1"></i>
+            Conserva este acuse impreso. Es <strong>obligatorio</strong> presentarlo
+            el día del examen junto con una identificación oficial.
+          </div>
+
+          <div class="d-flex flex-column flex-md-row gap-2 justify-content-end">
+            <button type="button" class="btn btn-outline-secondary" id="btnCerrarSesion">
+              <i class="bi bi-box-arrow-left me-1"></i>Cerrar sesión
+            </button>
+            <button type="button" class="btn btn-ipn px-4" id="btnImprimirAcuse">
+              <i class="bi bi-printer-fill me-1"></i>Imprimir Acuse
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <footer id="site-footer"></footer>
