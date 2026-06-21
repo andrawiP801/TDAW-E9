@@ -1,4 +1,3 @@
-
 (function () {
   "use strict";
 
@@ -38,6 +37,7 @@
     { value: "CECyT 17", nombre: 'CECyT 17 "León, Guanajuato"' },
     { value: "CECyT 18", nombre: 'CECyT 18 "Zacatecas"' },
     { value: "CECyT 19", nombre: 'CECyT 19 "Leona Vicario"' },
+    { value: "CETyT 20",    nombre: 'CETyT 20 "Natalia Serdán Alatriste"' },
     { value: "CET 1",    nombre: 'CET 1 "Walter Cross Buchanan"' },
     { value: "Otro",     nombre: "Otro" }
   ];
@@ -53,9 +53,9 @@
 
     nombre:   /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]{3,}$/,
 
-    curp:     /^[A-Z]{4}\d{6}[A-Z]{6}[A-Z0-9]{2}$/,
+    curp:     /^[A-Z]{4}\d{6}[A-Z]{6}[A-Z0-9]{1}[0-9]{1}$/,
 
-    telefono: /^\d{1,10}$/,
+    telefono: /^\d{10}$/,
 
     promedio: /^(?:10(?:\.0+)?|[6-9](?:\.\d+)?)$/,
 
@@ -181,6 +181,8 @@
         form.querySelectorAll(".is-invalid, .is-valid").forEach((el) =>
           el.classList.remove("is-invalid", "is-valid")
         );
+        const generoFeedback = document.getElementById("generoFeedback");
+        if (generoFeedback) generoFeedback.classList.remove("d-block");
         const nombreEsc = document.getElementById("nombreEscuela");
         nombreEsc.disabled = true;
         nombreEsc.required = false;
@@ -203,13 +205,28 @@
 
   function bindValidacionEnVivo() {
     Object.keys(LABELS).forEach((id) => {
+      if (id === "genero") return;
       const el = document.getElementById(id);
       if (!el) return;
       el.addEventListener("blur", () => validarCampo(id));
     });
+    document.querySelectorAll('input[name="genero"]').forEach((radio) => {
+      radio.addEventListener("change", () => validarCampo("genero"));
+    });
   }
 
   function validarCampo(id) {
+    if (id === "genero") {
+      const seleccionado = document.querySelector('input[name="genero"]:checked');
+      const grupo = document.getElementById("generoGroup");
+      const feedback = document.getElementById("generoFeedback");
+      const valido = !!seleccionado;
+      grupo.classList.toggle("is-invalid", !valido);
+      grupo.classList.toggle("is-valid", valido);
+      feedback.classList.toggle("d-block", !valido);
+      return valido;
+    }
+
     const el = document.getElementById(id);
     if (!el) return true;
     if (el.disabled) return true;
@@ -257,7 +274,14 @@
 
     if (!todoValido) {
       const primero = document.querySelector(".is-invalid");
-      if (primero) primero.focus();
+      if (primero && typeof primero.focus === "function") {
+        if (primero.id === "generoGroup") {
+          const radio = primero.querySelector('input[type="radio"]');
+          if (radio) radio.focus();
+        } else {
+          primero.focus();
+        }
+      }
       return;
     }
 
@@ -301,11 +325,12 @@
     const get = (id) => document.getElementById(id).value.trim();
     const nombreEsc = document.getElementById("nombreEscuela");
     const alcaldia = document.getElementById("alcaldia");
+    const generoSel = document.querySelector('input[name="genero"]:checked');
     return {
       boleta:        get("boleta"),
       nombre:        get("nombre"),
       fechaNac:      get("fechaNac"),
-      genero:        get("genero"),
+      genero:        generoSel ? generoSel.value : "",
       curp:          get("curp"),
       estado:        get("estado"),
       alcaldia:      alcaldia.disabled ? "(no aplica)" : get("alcaldia"),

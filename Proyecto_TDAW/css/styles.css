@@ -1,4 +1,3 @@
-
 :root {
   --ipn-guinda: #7a003c;
   --ipn-guinda-dark: #5c002d;
@@ -9,8 +8,8 @@
   --text-main: #212529;
 }
 
+/* --- Layout base --------------------------------------------------------- */
 html, body { height: 100%; }
-
 body {
   display: flex;
   flex-direction: column;
@@ -19,22 +18,20 @@ body {
   background-color: var(--bg-soft);
   color: var(--text-main);
 }
-
 main { flex: 1 0 auto; }
 
+/* --- Navbar -------------------------------------------------------------- */
 .navbar-escom {
   background: linear-gradient(135deg, var(--ipn-guinda) 0%, var(--escom-azul) 100%);
 }
 .navbar-escom .navbar-brand,
 .navbar-escom .nav-link { color: #fff !important; }
-
 .navbar-escom .nav-link {
   font-weight: 500;
   transition: opacity .2s, border-color .2s;
   border-bottom: 2px solid transparent;
 }
 .navbar-escom .nav-link:hover { opacity: 0.85; }
-
 .navbar-escom .nav-link.active {
   border-bottom-color: var(--accent-gold);
   font-weight: 700;
@@ -52,17 +49,16 @@ main { flex: 1 0 auto; }
   padding: 4px;
   box-sizing: border-box;
 }
-
 .brand-logo.team-logo {
   width: 88px;
   max-width: 88px;
 }
-
 .brand-text {
   font-weight: 600;
   letter-spacing: 0.3px;
 }
 
+/* --- Footer -------------------------------------------------------------- */
 .footer-escom {
   background: #1c1f24;
   color: #d9d9d9;
@@ -81,21 +77,19 @@ main { flex: 1 0 auto; }
   padding: 4px;
   box-sizing: border-box;
 }
-
 .footer-escom .footer-team-logo {
   width: 104px;
   max-width: 104px;
 }
 
+/* --- Form sections ------------------------------------------------------- */
 .form-section {
   background: #fff;
   border-radius: 0.75rem;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   border-left: 5px solid var(--ipn-guinda);
 }
-
 .form-section + .form-section { margin-top: 1.5rem; }
-
 .form-section .section-title {
   color: var(--escom-azul);
   font-weight: 700;
@@ -105,7 +99,6 @@ main { flex: 1 0 auto; }
   display: flex;
   align-items: center;
 }
-
 .form-section .section-number {
   display: inline-flex;
   width: 32px; height: 32px;
@@ -119,24 +112,24 @@ main { flex: 1 0 auto; }
   font-size: 1rem;
 }
 
+/* --- Botones ------------------------------------------------------------- */
 .btn-ipn {
   background-color: var(--ipn-guinda);
   border-color: var(--ipn-guinda);
   color: #fff;
 }
-
 .btn-ipn:hover, .btn-ipn:focus {
   background-color: var(--ipn-guinda-dark);
   border-color: var(--ipn-guinda-dark);
   color: #fff;
 }
 
+/* --- Carousel ------------------------------------------------------------ */
 .hero-carousel .carousel-item {
   height: 60vh;
   min-height: 360px;
   background-color: var(--escom-azul);
 }
-
 .hero-carousel .carousel-caption {
   background: rgba(0,0,0,0.45);
   border-radius: 0.5rem;
@@ -145,13 +138,13 @@ main { flex: 1 0 auto; }
   display: inline-block;
 }
 
+/* --- Cards de auth (admin / cuenta) -------------------------------------- */
 .auth-card {
   max-width: 460px;
   margin: 3rem auto;
   border-radius: 1rem;
   overflow: hidden;
 }
-
 .auth-card .auth-header {
   background: linear-gradient(135deg, var(--ipn-guinda), var(--escom-azul));
   color: #fff;
@@ -159,21 +152,31 @@ main { flex: 1 0 auto; }
   text-align: center;
 }
 
+/* --- Modal de confirmación ----------------------------------------------- */
 .modal-header.modal-ipn {
   background: linear-gradient(135deg, var(--ipn-guinda), var(--escom-azul));
   color: #fff;
 }
-
 .modal-header.modal-ipn .btn-close { filter: invert(1); }
-
 .review-list dt {
   color: var(--escom-azul);
   font-weight: 600;
 }
-
 .review-list dd { word-break: break-word; }
 
+/* --- Misceláneos --------------------------------------------------------- */
 .required-mark { color: var(--ipn-guinda); font-weight: bold; }
+
+/* Grupo de radio "Género" — feedback de validación visual */
+.genero-group {
+  border-radius: 0.375rem;
+  padding: 0.25rem 0.5rem;
+  transition: box-shadow .15s ease-in-out;
+}
+.genero-group.is-invalid {
+  box-shadow: 0 0 0 1px var(--bs-form-invalid-color, #dc3545);
+}
+.genero-group .form-check { margin-bottom: 0; }
 
 .placeholder-banner {
   background: linear-gradient(135deg, var(--ipn-guinda), var(--escom-azul));
@@ -182,13 +185,14 @@ main { flex: 1 0 auto; }
   padding: 2.25rem 1.5rem;
 }
 
+/* Card hover sutil en home */
 .card.hover-lift { transition: transform .2s, box-shadow .2s; }
-
 .card.hover-lift:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 20px rgba(0,0,0,0.08);
 }
 
+/* Mejora del foco accesible */
 .form-control:focus, .form-select:focus, .btn:focus {
   box-shadow: 0 0 0 0.2rem rgba(122, 0, 60, 0.25);
   border-color: var(--ipn-guinda);
