@@ -37,7 +37,7 @@
     { value: "CECyT 17", nombre: 'CECyT 17 "León, Guanajuato"' },
     { value: "CECyT 18", nombre: 'CECyT 18 "Zacatecas"' },
     { value: "CECyT 19", nombre: 'CECyT 19 "Leona Vicario"' },
-    { value: "CETyT 20",    nombre: 'CETyT 20 "Natalia Serdán Alatriste"' },
+    { value: "CETyT 20", nombre: 'CETyT 20 "Natalia Serdán Alatriste"' },
     { value: "CET 1",    nombre: 'CET 1 "Walter Cross Buchanan"' },
     { value: "Otro",     nombre: "Otro" }
   ];
