@@ -197,3 +197,54 @@ main { flex: 1 0 auto; }
   box-shadow: 0 0 0 0.2rem rgba(122, 0, 60, 0.25);
   border-color: var(--ipn-guinda);
 }
+
+/* --- Proceso de inscripción (timeline simple) ---------------------------- */
+.proceso-step {
+  background: #fff;
+  border-radius: 0.75rem;
+  padding: 1.5rem 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  border-top: 4px solid var(--ipn-guinda);
+  transition: transform .2s, box-shadow .2s;
+}
+.proceso-step:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+.proceso-step-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--ipn-guinda), var(--escom-azul));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+}
+.proceso-step-title {
+  color: var(--escom-azul);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.proceso-step-text {
+  font-size: 0.925rem;
+  color: #4a4a4a;
+  margin-bottom: 0;
+}
+
+/* --- Accordion FAQ ------------------------------------------------------- */
+#faqAccordion .accordion-button {
+  font-weight: 600;
+  color: var(--escom-azul);
+}
+#faqAccordion .accordion-button:not(.collapsed) {
+  background-color: rgba(122, 0, 60, 0.06);
+  color: var(--ipn-guinda);
+  box-shadow: inset 0 -1px 0 rgba(122, 0, 60, 0.2);
+}
+#faqAccordion .accordion-button:focus {
+  box-shadow: 0 0 0 0.2rem rgba(122, 0, 60, 0.20);
+  border-color: var(--ipn-guinda);
+}
