@@ -342,15 +342,20 @@
           alert(body.mensaje || "¡Datos guardados correctamente!");
 
           if (asignacion) {
-            const linea = document.createElement("div");
-            linea.className = "alert alert-success mt-3 mb-0";
-            linea.innerHTML =
-              `<i class="bi bi-check-circle me-1"></i>` +
-              `<strong>Asignación:</strong> ${asignacion.laboratorio} · ` +
-              `${asignacion.fecha} · ${asignacion.horario}`;
             const cuerpo = document.querySelector("#modalRevision .modal-body");
-            const previo = cuerpo.querySelector(".alert-success");
+            const previo = document.getElementById("acuseAsignacion");
             if (previo) previo.remove();
+
+            const linea = document.createElement("div");
+            linea.id = "acuseAsignacion";
+            linea.className =
+              "border border-success rounded p-3 mt-3 mb-0 bg-white";
+            linea.innerHTML =
+              `<i class="bi bi-check-circle me-1 text-success"></i>` +
+              `<strong>Asignación oficial:</strong> ` +
+              `<span class="datos-examen-resaltados">${asignacion.laboratorio}</span>` +
+              ` &middot; ${asignacion.fecha} &middot; ` +
+              `<span class="datos-examen-resaltados">${asignacion.horario}</span>`;
             cuerpo.appendChild(linea);
           }
 
