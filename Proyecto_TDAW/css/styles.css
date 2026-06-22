@@ -248,3 +248,76 @@ main { flex: 1 0 auto; }
   box-shadow: 0 0 0 0.2rem rgba(122, 0, 60, 0.20);
   border-color: var(--ipn-guinda);
 }
+
+/* ============================================================
+   CONFIGURACIÓN DE IMPRESIÓN OFICIAL (ACUSE DE EXAMEN)
+   ============================================================ */
+@media print {
+  /* 1. Ocultar elementos de la interfaz de usuario que no van en el documento */
+  #site-header,
+  #site-footer,
+  .navbar,
+  .btn,
+  .modal-footer,
+  #btnCerrarSesion,
+  #btnImprimirAcuse,
+  #btnCorregir,
+  #btnConfirmar,
+  .alert,
+  .captcha-box {
+    display: none !important;
+  }
+
+  /* 2. Limpiar fondos grises y sombras para optimizar la hoja blanca */
+  body, main, .card, .modal-body, .modal-content {
+    background: #ffffff !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* 3. Forzar el respeto de los colores guinda/azul institucionales en títulos */
+  .auth-header,
+  .modal-header.modal-ipn,
+  h1, h2, .section-title, .text-highlight {
+    color: var(--ipn-guinda, #660033) !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* 4. Resaltar laboratorio y horario en un color que no sea negro */
+  .badge-escuela,
+  .datos-examen-resaltados {
+    color: #003366 !important; /* Azul marino institucional */
+    font-weight: bold !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* 5. Inyectar encabezado oficial con logos del IPN y ESCOM en la hoja */
+  main::before {
+    content: "";
+    display: block;
+    height: 80px;
+    margin-bottom: 20px;
+    border-bottom: 3px solid #660033;
+    background-image: url("../assets/logo-ipn.svg"), url("../assets/EscudoESCOM.svg");
+    background-position: left center, right center;
+    background-size: contain, contain;
+    background-repeat: no-repeat, no-repeat;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* 6. Evitar que las listas de datos se corten a la mitad entre dos páginas */
+  .review-list, dl, .card-body, tr, .row {
+    page-break-inside: avoid !important;
+  }
+
+  /* 7. Configuración estandarizada del tamaño de papel */
+  @page {
+    size: letter;
+    margin: 1.5cm 2cm;
+  }
+}

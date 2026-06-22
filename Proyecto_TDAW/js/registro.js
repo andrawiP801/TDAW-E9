@@ -322,45 +322,38 @@
 
     modal.show();
 
+    let asignacion = null;
+
     btnConfirmar.onclick = () => {
       btnConfirmar.disabled = true;
 
-      // ============================================================
-      // BLOQUE FETCH REAL — descomentar cuando el backend PHP esté listo
-      // ============================================================
-      // fetch("api/registrar_alumno.php", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify(datos),
-      // })
-      //   .then((res) => res.json())
-      //   .then((data) => {
-      //     if (data.ok) {
-      //       alert("¡Datos guardados correctamente!");
-      //       btnConfirmar.classList.add("d-none");
-      //       btnImprimir.classList.remove("d-none");
-      //       btnImprimir.disabled = false;
-      //       btnImprimir.focus();
-      //     } else {
-      //       alert("Error del servidor: " + (data.mensaje || "desconocido"));
-      //       btnConfirmar.disabled = false;
-      //     }
-      //   })
-      //   .catch((err) => {
-      //     alert("Error de red: " + err.message);
-      //     btnConfirmar.disabled = false;
-      //   });
-
-      // ===== Simulación AJAX (mock local, sin tocar red) =====
-      Promise.resolve({
-        ok: true,
-        fecha: "2026-08-24",
-        mensaje: "Registro recibido correctamente",
-        payload: datos,
+      fetch("api/registrar_alumno.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(datos),
       })
-        .then((data) => {
-          if (!data.ok) throw new Error(data.mensaje);
-          alert("¡Datos guardados correctamente!");
+        .then((res) => res.json().then((body) => ({ status: res.status, body })))
+        .then(({ body }) => {
+          if (!body.ok) {
+            throw new Error(body.mensaje || "Error desconocido del servidor.");
+          }
+
+          asignacion = body.asignacion || null;
+          alert(body.mensaje || "¡Datos guardados correctamente!");
+
+          if (asignacion) {
+            const linea = document.createElement("div");
+            linea.className = "alert alert-success mt-3 mb-0";
+            linea.innerHTML =
+              `<i class="bi bi-check-circle me-1"></i>` +
+              `<strong>Asignación:</strong> ${asignacion.laboratorio} · ` +
+              `${asignacion.fecha} · ${asignacion.horario}`;
+            const cuerpo = document.querySelector("#modalRevision .modal-body");
+            const previo = cuerpo.querySelector(".alert-success");
+            if (previo) previo.remove();
+            cuerpo.appendChild(linea);
+          }
+
           btnConfirmar.classList.add("d-none");
           btnImprimir.classList.remove("d-none");
           btnImprimir.disabled = false;
@@ -373,7 +366,15 @@
     };
 
     btnImprimir.onclick = () => {
-      window.print();
+      if (asignacion) {
+        const titulo = document.title;
+        document.title =
+          `Acuse — ${datos.nombre} · ${asignacion.laboratorio} · ${asignacion.horario}`;
+        window.print();
+        document.title = titulo;
+      } else {
+        window.print();
+      }
     };
 
     const modalEl = document.getElementById("modalRevision");

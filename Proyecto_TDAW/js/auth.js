@@ -7,13 +7,13 @@
 
   const CaptchaController = {
     create(preguntaEl, inputEl, refreshBtn) {
-      const state = { resultado: 0 };
+      const state = { a: 0, b: 0, resultado: 0 };
 
       const generar = () => {
-        const a = Math.floor(Math.random() * 9) + 1;
-        const b = Math.floor(Math.random() * 9) + 1;
-        state.resultado = a + b;
-        preguntaEl.textContent = `${a} + ${b} = ?`;
+        state.a = Math.floor(Math.random() * 9) + 1;
+        state.b = Math.floor(Math.random() * 9) + 1;
+        state.resultado = state.a + state.b;
+        preguntaEl.textContent = `${state.a} + ${state.b} = ?`;
         inputEl.value = "";
         inputEl.classList.remove("is-invalid", "is-valid");
       };
@@ -31,6 +31,12 @@
         return ok;
       };
 
+      const getOperandos = () => ({
+        a: state.a,
+        b: state.b,
+        respuesta: parseInt((inputEl.value || "0").trim(), 10) || 0,
+      });
+
       refreshBtn.addEventListener("click", generar);
       inputEl.addEventListener("input", () => {
         if (inputEl.classList.contains("is-invalid")) {
@@ -39,21 +45,29 @@
       });
 
       generar();
-      return { generar, validar };
+      return { generar, validar, getOperandos };
     },
   };
+
+  function pintarAsignacion({ fecha, horario, laboratorio, boleta }) {
+    const $ = (id) => document.getElementById(id);
+    if ($("examenFecha")    && fecha)       $("examenFecha").textContent    = fecha;
+    if ($("examenHorario")  && horario)     $("examenHorario").textContent  = horario;
+    if ($("examenLab")      && laboratorio) $("examenLab").textContent      = laboratorio;
+    if ($("examenBoleta")   && boleta)      $("examenBoleta").textContent   = boleta;
+  }
 
   function initCuenta() {
     const formCuenta = document.getElementById("formCuenta");
     if (!formCuenta) return;
 
-    const inputUser = document.getElementById("cuentaUser");
-    const panelLogin = document.getElementById("panelLoginCuenta");
+    const inputUser   = document.getElementById("cuentaUser");
+    const inputPass   = document.getElementById("cuentaPass");
+    const panelLogin  = document.getElementById("panelLoginCuenta");
     const vistaExamen = document.getElementById("vistaExamen");
     const examenNombre = document.getElementById("examenNombre");
-    const examenBoleta = document.getElementById("examenBoleta");
-    const btnImprimir = document.getElementById("btnImprimirAcuse");
-    const btnCerrar = document.getElementById("btnCerrarSesion");
+    const btnImprimir  = document.getElementById("btnImprimirAcuse");
+    const btnCerrar    = document.getElementById("btnCerrarSesion");
 
     const captcha = CaptchaController.create(
       document.getElementById("captchaPreguntaCuenta"),
@@ -77,48 +91,97 @@
 
     formCuenta.addEventListener("submit", (e) => {
       e.preventDefault();
-      const userOk = validarUsuario();
+      const userOk    = validarUsuario();
       const captchaOk = captcha.validar();
 
-      if (!userOk) {
-        inputUser.focus();
-        return;
-      }
+      if (!userOk)    { inputUser.focus(); return; }
       if (!captchaOk) {
         captcha.generar();
         alert("CAPTCHA incorrecto. Se generó una nueva operación, inténtalo de nuevo.");
         return;
       }
 
-      const usuario = inputUser.value.trim();
-      examenNombre.textContent = usuario;
-      examenBoleta.textContent = REGEX_BOLETA.test(usuario.toUpperCase())
-        ? usuario.toUpperCase()
-        : "(consulta tu boleta en el correo de confirmación)";
+      const operandos = captcha.getOperandos();
+      const payload = {
+        usuario_login: inputUser.value.trim(),
+        contrasena:    inputPass.value,
+        captcha_a:     operandos.a,
+        captcha_b:     operandos.b,
+        captcha:       operandos.respuesta,
+      };
 
-      panelLogin.classList.add("d-none");
-      vistaExamen.classList.remove("d-none");
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      fetch("api/login.php", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
+        .then((res) => res.json().then((body) => ({ status: res.status, body })))
+        .then(({ status, body }) => {
+          if (status !== 200 || !body.ok) {
+            throw new Error(body.mensaje || "No se pudo iniciar sesión.");
+          }
+          if ((body.tipo_usuario || "").toUpperCase() !== "ALUMNO") {
+            throw new Error("Esta cuenta no es de alumno. Usa el panel de Admin.");
+          }
+          return fetch("api/obtener_examen.php", { credentials: "include" })
+            .then((r) => r.json());
+        })
+        .then((examen) => {
+          if (!examen.ok) throw new Error(examen.mensaje || "No se pudo cargar el examen.");
+
+          const nombre = examen.alumno?.nombre || inputUser.value.trim();
+          examenNombre.textContent = nombre;
+
+          if (examen.asignacion) {
+            pintarAsignacion({
+              fecha:       examen.asignacion.fecha,
+              horario:     examen.asignacion.horario,
+              laboratorio: examen.asignacion.laboratorio,
+              boleta:      examen.alumno?.boleta || "—",
+            });
+          } else {
+            pintarAsignacion({
+              fecha: "Pendiente de asignación",
+              horario: "—",
+              laboratorio: "—",
+              boleta: examen.alumno?.boleta || "—",
+            });
+          }
+
+          panelLogin.classList.add("d-none");
+          vistaExamen.classList.remove("d-none");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        })
+        .catch((err) => {
+          captcha.generar();
+          alert("Error: " + err.message);
+        });
     });
 
-    btnImprimir.addEventListener("click", () => {
-      window.print();
-    });
+    btnImprimir.addEventListener("click", () => window.print());
 
     btnCerrar.addEventListener("click", () => {
-      vistaExamen.classList.add("d-none");
-      panelLogin.classList.remove("d-none");
-      formCuenta.reset();
-      formCuenta
-        .querySelectorAll(".is-invalid, .is-valid")
-        .forEach((el) => el.classList.remove("is-invalid", "is-valid"));
-      captcha.generar();
+      fetch("api/logout.php", { method: "POST", credentials: "include" })
+        .catch(() => {})
+        .finally(() => {
+          vistaExamen.classList.add("d-none");
+          panelLogin.classList.remove("d-none");
+          formCuenta.reset();
+          formCuenta
+            .querySelectorAll(".is-invalid, .is-valid")
+            .forEach((el) => el.classList.remove("is-invalid", "is-valid"));
+          captcha.generar();
+        });
     });
   }
 
   function initAdmin() {
     const formAdmin = document.getElementById("formAdmin");
     if (!formAdmin) return;
+
+    const inputUser = document.getElementById("adminUser");
+    const inputPass = document.getElementById("adminPass");
 
     const captcha = CaptchaController.create(
       document.getElementById("captchaPreguntaAdmin"),
@@ -128,23 +191,49 @@
 
     formAdmin.addEventListener("submit", (e) => {
       e.preventDefault();
-      const usuario = document.getElementById("adminUser").value.trim();
-      if (!usuario) {
-        document.getElementById("adminUser").focus();
-        return;
-      }
+      const usuario = inputUser.value.trim();
+      if (!usuario) { inputUser.focus(); return; }
       if (!captcha.validar()) {
         captcha.generar();
         alert("CAPTCHA incorrecto. Se generó una nueva operación, inténtalo de nuevo.");
         return;
       }
 
-      document.dispatchEvent(
-        new CustomEvent("admin:login-success", { detail: { usuario } })
-      );
+      const operandos = captcha.getOperandos();
+      const payload = {
+        usuario_login: usuario,
+        contrasena:    inputPass.value,
+        captcha_a:     operandos.a,
+        captcha_b:     operandos.b,
+        captcha:       operandos.respuesta,
+      };
+
+      fetch("api/login.php", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
+        .then((res) => res.json().then((body) => ({ status: res.status, body })))
+        .then(({ status, body }) => {
+          if (status !== 200 || !body.ok) {
+            throw new Error(body.mensaje || "No se pudo iniciar sesión.");
+          }
+          if ((body.tipo_usuario || "").toUpperCase() !== "ADMIN") {
+            throw new Error("Esta cuenta no tiene permisos de administrador.");
+          }
+          document.dispatchEvent(
+            new CustomEvent("admin:login-success", { detail: { usuario } })
+          );
+        })
+        .catch((err) => {
+          captcha.generar();
+          alert("Error: " + err.message);
+        });
     });
 
     document.addEventListener("admin:logout", () => {
+      fetch("api/logout.php", { method: "POST", credentials: "include" }).catch(() => {});
       formAdmin.reset();
       formAdmin
         .querySelectorAll(".is-invalid, .is-valid")
