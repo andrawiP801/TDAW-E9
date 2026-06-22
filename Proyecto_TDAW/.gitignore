@@ -1,0 +1,27 @@
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editores / IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs y temporales de XAMPP
+*.log
+*.sql.bak
+*.bak
+*.tmp
+
+# Credenciales y configuración local (¡Crítico!)
+.env
+.env.local
+config.local.php
+db_config.php
+
+# Carpetas de dependencias futuras
+/vendor/
+/node_modules/
