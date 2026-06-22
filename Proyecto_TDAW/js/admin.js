@@ -27,6 +27,7 @@
     bindCreateForm();
     bindEditForm();
     bindDeleteModal();
+    bindBuscador();
   });
 
   function bindLoginEvents() {
@@ -66,16 +67,21 @@
       });
   }
 
-  function renderTabla() {
+  function renderTabla(lista) {
+    const filas = Array.isArray(lista) ? lista : alumnos;
     tbody.innerHTML = "";
 
-    if (alumnos.length === 0) {
+    if (filas.length === 0) {
+      const msg = alumnos.length === 0
+        ? "Sin alumnos registrados."
+        : "Ningún alumno coincide con la búsqueda.";
       tbody.innerHTML =
-        '<tr><td colspan="6" class="text-center text-muted py-3">Sin alumnos registrados.</td></tr>';
+        `<tr><td colspan="6" class="text-center text-muted py-3">${msg}</td></tr>`;
       return;
     }
 
-    alumnos.forEach((alumno, idx) => {
+    filas.forEach((alumno) => {
+      const idx = alumnos.indexOf(alumno);
       const tr = document.createElement("tr");
       tr.dataset.index = idx;
       tr.innerHTML = `
@@ -111,16 +117,34 @@
     form.addEventListener("submit", (e) => {
       e.preventDefault();
 
+      const get = (id) => (document.getElementById(id).value || "").trim();
+
       const nuevo = {
-        boleta:      document.getElementById("createBoleta").value.trim().toUpperCase(),
-        nombre:      document.getElementById("createNombre").value.trim(),
-        carrera:     document.getElementById("createCarrera").value,
-        laboratorio: document.getElementById("createLab").value,
-        horario:     document.getElementById("createHorario").value,
+        curp:          get("createCurp").toUpperCase(),
+        boleta:        get("createBoleta").toUpperCase(),
+        nombre:        get("createNombre"),
+        fechaNac:      get("createFechaNac"),
+        genero:        get("createGenero"),
+        telefono:      get("createTelefono"),
+        estado:        get("createEstado"),
+        alcaldia:      get("createAlcaldia"),
+        carrera:       get("createCarrera"),
+        nombreEscuela: get("createEscuela"),
+        promedio:      get("createPromedio"),
+        correo:        get("createCorreo"),
+        password:      get("createPassword"),
+        laboratorio:   get("createLab"),
+        horario:       get("createHorario"),
       };
 
-      if (!nuevo.boleta || !nuevo.nombre || !nuevo.carrera || !nuevo.laboratorio || !nuevo.horario) {
-        alert("Completa todos los campos obligatorios.");
+      const obligatorios = [
+        "curp", "boleta", "nombre", "fechaNac", "genero", "telefono",
+        "estado", "carrera", "nombreEscuela", "promedio", "correo",
+        "password", "laboratorio", "horario",
+      ];
+      const faltantes = obligatorios.filter((k) => !nuevo[k]);
+      if (faltantes.length) {
+        alert("Completa todos los campos obligatorios: " + faltantes.join(", "));
         return;
       }
 
@@ -206,6 +230,31 @@
     deleteTargetIndex = idx;
     document.getElementById("deleteBoletaTxt").textContent = a.boleta || "(sin boleta)";
     modalDelete.show();
+  }
+
+  function bindBuscador() {
+    const input = document.getElementById("buscarAlumno");
+    if (!input) return;
+
+    input.addEventListener("input", () => {
+      const term = (input.value || "").trim().toLowerCase();
+      if (!term) {
+        renderTabla(alumnos);
+        return;
+      }
+
+      const filtrados = alumnos.filter((a) => {
+        const carreraNombre = CARRERAS[a.carrera] || a.carrera || "";
+        return (
+          (a.nombre  || "").toLowerCase().includes(term) ||
+          (a.boleta  || "").toLowerCase().includes(term) ||
+          (a.carrera || "").toLowerCase().includes(term) ||
+          carreraNombre.toLowerCase().includes(term)
+        );
+      });
+
+      renderTabla(filtrados);
+    });
   }
 
   function bindDeleteModal() {

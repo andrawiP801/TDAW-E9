@@ -57,6 +57,35 @@
     if ($("examenBoleta")   && boleta)      $("examenBoleta").textContent   = boleta;
   }
 
+  function pintarVistaExamen(examen, fallbackNombre) {
+    const panelLogin   = document.getElementById("panelLoginCuenta");
+    const vistaExamen  = document.getElementById("vistaExamen");
+    const examenNombre = document.getElementById("examenNombre");
+    if (!panelLogin || !vistaExamen || !examenNombre) return;
+
+    const nombre = examen.alumno?.nombre || fallbackNombre || "aspirante";
+    examenNombre.textContent = nombre;
+
+    if (examen.asignacion) {
+      pintarAsignacion({
+        fecha:       examen.asignacion.fecha,
+        horario:     examen.asignacion.horario,
+        laboratorio: examen.asignacion.laboratorio,
+        boleta:      examen.alumno?.boleta || "—",
+      });
+    } else {
+      pintarAsignacion({
+        fecha: "Pendiente de asignación",
+        horario: "—",
+        laboratorio: "—",
+        boleta: examen.alumno?.boleta || "—",
+      });
+    }
+
+    panelLogin.classList.add("d-none");
+    vistaExamen.classList.remove("d-none");
+  }
+
   function initCuenta() {
     const formCuenta = document.getElementById("formCuenta");
     if (!formCuenta) return;
@@ -129,28 +158,7 @@
         })
         .then((examen) => {
           if (!examen.ok) throw new Error(examen.mensaje || "No se pudo cargar el examen.");
-
-          const nombre = examen.alumno?.nombre || inputUser.value.trim();
-          examenNombre.textContent = nombre;
-
-          if (examen.asignacion) {
-            pintarAsignacion({
-              fecha:       examen.asignacion.fecha,
-              horario:     examen.asignacion.horario,
-              laboratorio: examen.asignacion.laboratorio,
-              boleta:      examen.alumno?.boleta || "—",
-            });
-          } else {
-            pintarAsignacion({
-              fecha: "Pendiente de asignación",
-              horario: "—",
-              laboratorio: "—",
-              boleta: examen.alumno?.boleta || "—",
-            });
-          }
-
-          panelLogin.classList.add("d-none");
-          vistaExamen.classList.remove("d-none");
+          pintarVistaExamen(examen, inputUser.value.trim());
           window.scrollTo({ top: 0, behavior: "smooth" });
         })
         .catch((err) => {
@@ -242,8 +250,38 @@
     });
   }
 
+  function restaurarSesion() {
+    const page = (document.body.dataset.page || "").toLowerCase();
+    if (page !== "cuenta" && page !== "admin") return;
+
+    fetch("api/verificar_sesion.php", { credentials: "include" })
+      .then((res) => res.json())
+      .then((body) => {
+        if (!body || !body.ok || !body.autenticado) return;
+        const tipo = (body.tipo_usuario || "").toUpperCase();
+
+        if (page === "cuenta" && tipo === "ALUMNO") {
+          fetch("api/obtener_examen.php", { credentials: "include" })
+            .then((r) => r.json())
+            .then((examen) => {
+              if (!examen || !examen.ok) return;
+              pintarVistaExamen(examen, "");
+            })
+            .catch(() => {});
+        } else if (page === "admin" && tipo === "ADMIN") {
+          document.dispatchEvent(
+            new CustomEvent("admin:login-success", {
+              detail: { usuario: "(sesión activa)", restaurada: true },
+            })
+          );
+        }
+      })
+      .catch(() => {});
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     initCuenta();
     initAdmin();
+    restaurarSesion();
   });
 })();

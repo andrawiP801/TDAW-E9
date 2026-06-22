@@ -317,6 +317,8 @@
 
     btnConfirmar.classList.remove("d-none");
     btnConfirmar.disabled = false;
+    btnCorregir.classList.remove("d-none");
+    btnCorregir.disabled = false;
     btnImprimir.classList.add("d-none");
     btnImprimir.disabled = true;
 
@@ -360,6 +362,9 @@
           }
 
           btnConfirmar.classList.add("d-none");
+          btnConfirmar.disabled = true;
+          btnCorregir.classList.add("d-none");
+          btnCorregir.disabled = true;
           btnImprimir.classList.remove("d-none");
           btnImprimir.disabled = false;
           btnImprimir.focus();
@@ -392,6 +397,8 @@
       btnImprimir.disabled = true;
       btnConfirmar.classList.remove("d-none");
       btnConfirmar.disabled = false;
+      btnCorregir.classList.remove("d-none");
+      btnCorregir.disabled = false;
       modalEl.removeEventListener("hidden.bs.modal", onHidden);
     };
     modalEl.addEventListener("hidden.bs.modal", onHidden);
