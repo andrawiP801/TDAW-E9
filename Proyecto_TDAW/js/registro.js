@@ -289,120 +289,138 @@
   }
 
   function mostrarModalRevision() {
-    const datos = recolectarDatos();
-    const saludo = document.getElementById("modalSaludo");
-    const lista = document.getElementById("modalDatos");
+  const datos = recolectarDatos();
+  const saludo = document.getElementById("modalSaludo");
+  const lista = document.getElementById("modalDatos");
 
-    saludo.textContent =
-      `Hola ${datos.nombre}, verifica que los datos que ingresaste sean correctos:`;
+  saludo.textContent =
+    `Hola ${datos.nombre}, verifica que los datos que ingresaste sean correctos:`;
 
-    lista.innerHTML = "";
-    Object.entries(datos).forEach(([key, valor]) => {
-      const dt = document.createElement("dt");
-      dt.className = "col-sm-5";
-      dt.textContent = LABELS[key] || key;
+  lista.innerHTML = "";
 
-      const dd = document.createElement("dd");
-      dd.className = "col-sm-7";
-      dd.textContent = valor || "—";
+  Object.entries(datos).forEach(([key, valor]) => {
+    const dt = document.createElement("dt");
+    dt.className = "col-sm-5";
+    dt.textContent = LABELS[key] || key;
 
-      lista.appendChild(dt);
-      lista.appendChild(dd);
-    });
+    const dd = document.createElement("dd");
+    dd.className = "col-sm-7";
+    dd.textContent = valor || "—";
 
-    const modal = new bootstrap.Modal(document.getElementById("modalRevision"));
-    const btnConfirmar = document.getElementById("btnConfirmar");
-    const btnImprimir = document.getElementById("btnImprimirAcuse");
-    const btnCorregir = document.getElementById("btnCorregir");
+    lista.appendChild(dt);
+    lista.appendChild(dd);
+  });
 
-    btnConfirmar.classList.remove("d-none");
-    btnConfirmar.disabled = false;
-    btnCorregir.classList.remove("d-none");
-    btnCorregir.disabled = false;
+  const modal = new bootstrap.Modal(document.getElementById("modalRevision"));
+  const btnConfirmar = document.getElementById("btnConfirmar");
+  const btnImprimir = document.getElementById("btnImprimirAcuse");
+  const btnCorregir = document.getElementById("btnCorregir");
+
+  btnConfirmar.classList.remove("d-none");
+  btnConfirmar.disabled = false;
+
+  btnCorregir.classList.remove("d-none");
+  btnCorregir.disabled = false;
+
+  btnImprimir.classList.add("d-none");
+  btnImprimir.disabled = true;
+
+  modal.show();
+
+  let asignacion = null;
+  let curpRegistrada = "";
+
+  btnConfirmar.onclick = () => {
+    btnConfirmar.disabled = true;
+
+    fetch("api/registrar_alumno.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(datos),
+    })
+      .then((res) => res.json().then((body) => ({ status: res.status, body })))
+      .then(({ body }) => {
+        if (!body.ok) {
+          throw new Error(body.mensaje || "Error desconocido del servidor.");
+        }
+
+        asignacion = body.asignacion || null;
+        curpRegistrada = datos.curp;
+
+        alert(body.mensaje || "¡Datos guardados correctamente!");
+
+        if (asignacion) {
+          const cuerpo = document.querySelector("#modalRevision .modal-body");
+          const previo = document.getElementById("acuseAsignacion");
+
+          if (previo) previo.remove();
+
+          const linea = document.createElement("div");
+          linea.id = "acuseAsignacion";
+          linea.className =
+            "border border-success rounded p-3 mt-3 mb-0 bg-white";
+
+          linea.innerHTML =
+            `<i class="bi bi-check-circle me-1 text-success"></i>` +
+            `<strong>Asignación oficial:</strong> ` +
+            `<span class="datos-examen-resaltados">${asignacion.laboratorio}</span>` +
+            ` &middot; ${asignacion.fecha} &middot; ` +
+            `<span class="datos-examen-resaltados">${asignacion.horario}</span>`;
+
+          cuerpo.appendChild(linea);
+        }
+
+        btnConfirmar.classList.add("d-none");
+        btnConfirmar.disabled = true;
+
+        btnCorregir.classList.add("d-none");
+        btnCorregir.disabled = true;
+
+        btnImprimir.classList.remove("d-none");
+        btnImprimir.disabled = false;
+        btnImprimir.focus();
+      })
+      .catch((err) => {
+        alert("Error: " + err.message);
+        btnConfirmar.disabled = false;
+      });
+  };
+
+  btnImprimir.onclick = () => {
+    if (!curpRegistrada) {
+      alert("No se encontró la CURP para generar el PDF.");
+      return;
+    }
+
+    window.open(
+      `api/generarPdf.php?curp=${encodeURIComponent(curpRegistrada)}`,
+      "_blank"
+    );
+  };
+
+  const modalEl = document.getElementById("modalRevision");
+
+  const onHidden = () => {
+    const exitoso = btnConfirmar.classList.contains("d-none");
+
+    if (exitoso) {
+      document.getElementById("formRegistro").reset();
+    }
+
     btnImprimir.classList.add("d-none");
     btnImprimir.disabled = true;
 
-    modal.show();
+    btnConfirmar.classList.remove("d-none");
+    btnConfirmar.disabled = false;
 
-    let asignacion = null;
+    btnCorregir.classList.remove("d-none");
+    btnCorregir.disabled = false;
 
-    btnConfirmar.onclick = () => {
-      btnConfirmar.disabled = true;
+    modalEl.removeEventListener("hidden.bs.modal", onHidden);
+  };
 
-      fetch("api/registrar_alumno.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(datos),
-      })
-        .then((res) => res.json().then((body) => ({ status: res.status, body })))
-        .then(({ body }) => {
-          if (!body.ok) {
-            throw new Error(body.mensaje || "Error desconocido del servidor.");
-          }
-
-          asignacion = body.asignacion || null;
-          alert(body.mensaje || "¡Datos guardados correctamente!");
-
-          if (asignacion) {
-            const cuerpo = document.querySelector("#modalRevision .modal-body");
-            const previo = document.getElementById("acuseAsignacion");
-            if (previo) previo.remove();
-
-            const linea = document.createElement("div");
-            linea.id = "acuseAsignacion";
-            linea.className =
-              "border border-success rounded p-3 mt-3 mb-0 bg-white";
-            linea.innerHTML =
-              `<i class="bi bi-check-circle me-1 text-success"></i>` +
-              `<strong>Asignación oficial:</strong> ` +
-              `<span class="datos-examen-resaltados">${asignacion.laboratorio}</span>` +
-              ` &middot; ${asignacion.fecha} &middot; ` +
-              `<span class="datos-examen-resaltados">${asignacion.horario}</span>`;
-            cuerpo.appendChild(linea);
-          }
-
-          btnConfirmar.classList.add("d-none");
-          btnConfirmar.disabled = true;
-          btnCorregir.classList.add("d-none");
-          btnCorregir.disabled = true;
-          btnImprimir.classList.remove("d-none");
-          btnImprimir.disabled = false;
-          btnImprimir.focus();
-        })
-        .catch((err) => {
-          alert("Error: " + err.message);
-          btnConfirmar.disabled = false;
-        });
-    };
-
-    btnImprimir.onclick = () => {
-      if (asignacion) {
-        const titulo = document.title;
-        document.title =
-          `Acuse — ${datos.nombre} · ${asignacion.laboratorio} · ${asignacion.horario}`;
-        window.print();
-        document.title = titulo;
-      } else {
-        window.print();
-      }
-    };
-
-    const modalEl = document.getElementById("modalRevision");
-    const onHidden = () => {
-      const exitoso = btnConfirmar.classList.contains("d-none");
-      if (exitoso) {
-        document.getElementById("formRegistro").reset();
-      }
-      btnImprimir.classList.add("d-none");
-      btnImprimir.disabled = true;
-      btnConfirmar.classList.remove("d-none");
-      btnConfirmar.disabled = false;
-      btnCorregir.classList.remove("d-none");
-      btnCorregir.disabled = false;
-      modalEl.removeEventListener("hidden.bs.modal", onHidden);
-    };
-    modalEl.addEventListener("hidden.bs.modal", onHidden);
-  }
+  modalEl.addEventListener("hidden.bs.modal", onHidden);
+}
 
   function recolectarDatos() {
     const get = (id) => document.getElementById(id).value.trim();
