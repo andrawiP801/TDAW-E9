@@ -1,12 +1,6 @@
 <?php
 declare(strict_types=1);
 
-/**
- * Conexión PDO a la base de datos 'Escuela' (XAMPP).
- * Uso desde otros scripts:
- *     $pdo = require __DIR__ . '/conexion.php';
- */
-
 $DB_HOST = 'localhost';
 $DB_NAME = 'Escuela';
 $DB_USER = 'root';

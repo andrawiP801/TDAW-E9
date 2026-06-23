@@ -70,6 +70,14 @@ if (!$idHorario) {
 }
 $idHorario = (int) $idHorario;
 
+// Etiquetas espejo a las de api/registrar_alumno.php para que el acuse del admin
+// muestre exactamente la misma cadena de horario que el flujo público.
+$HORARIOS_LABEL = [
+    1 => '11:00 - 12:30',
+    2 => '12:45 - 14:15',
+    3 => '14:30 - 16:00',
+];
+
 $hashPassword = password_hash($password, PASSWORD_BCRYPT);
 
 try {
@@ -104,9 +112,14 @@ try {
     $pdo->commit();
 
     json_response(200, [
-        'ok'      => true,
-        'mensaje' => 'Alumno registrado correctamente.',
-        'curp'    => $curp,
+        'ok'         => true,
+        'mensaje'    => 'Alumno registrado correctamente.',
+        'curp'       => $curp,
+        'asignacion' => [
+            'fecha'       => '24 de Agosto de 2026',
+            'horario'     => $HORARIOS_LABEL[$idHorario] ?? $horario,
+            'laboratorio' => 'Laboratorio ' . $idSalon,
+        ],
     ]);
 } catch (PDOException $e) {
     if ($pdo->inTransaction()) $pdo->rollBack();

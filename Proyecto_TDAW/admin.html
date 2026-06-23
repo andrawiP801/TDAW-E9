@@ -271,6 +271,45 @@
     </div>
   </div>
 
+  <!-- ================== Modal: Revisión Previa al Alta (Admin) ================== -->
+  <div class="modal fade" id="modalAdminRevision" tabindex="-1"
+       aria-labelledby="modalAdminRevisionLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header modal-ipn">
+          <h1 class="modal-title fs-5" id="modalAdminRevisionLabel">
+            <i class="bi bi-clipboard-check me-2"></i>Revisión de Datos del Aspirante
+          </h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <p class="lead mb-3" id="adminRevisionSaludo">
+            Verifica que los datos capturados sean correctos antes de guardarlos definitivamente en el sistema.
+          </p>
+          <hr>
+          <dl class="row review-list" id="adminRevisionDatos"></dl>
+          <div id="adminAcuseAsignacion"
+               class="border border-success rounded p-3 mt-3 mb-0 bg-white d-none"
+               role="status" aria-live="polite"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" id="btnAdminCorregir">
+            <i class="bi bi-pencil me-1"></i>Corregir Datos
+          </button>
+          <button type="button" class="btn btn-ipn" id="btnAdminConfirmarAlta">
+            <span class="spinner-border spinner-border-sm me-1 d-none" id="spinnerAdminConfirmar"
+                  role="status" aria-hidden="true"></span>
+            <i class="bi bi-check-lg me-1" id="iconAdminConfirmar"></i>
+            <span>Confirmar y Guardar</span>
+          </button>
+          <button type="button" id="btnAdminImprimirAcuse" class="btn btn-primary d-none" disabled>
+            <i class="bi bi-printer-fill me-2"></i>Imprimir Acuse Oficial
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ================== Modal: Editar Alumno (Update) ================== -->
   <div class="modal fade" id="modalAlumnoEdit" tabindex="-1"
        aria-labelledby="modalAlumnoEditLabel" aria-hidden="true">

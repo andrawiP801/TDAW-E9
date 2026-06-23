@@ -63,6 +63,25 @@
   const MSG_CUPO_LLENO =
     "Error: El laboratorio o el horario seleccionado ya se encuentra al límite de su capacidad (30 por salón / 150 por turno). Elige otra combinación.";
 
+  // Etiquetas legibles que se muestran en el modal de revisión del admin.
+  // El orden de las claves dicta el orden visual en el <dl>.
+  const ADMIN_REVIEW_LABELS = {
+    curp:          "CURP",
+    boleta:        "Boleta",
+    nombre:        "Nombre completo",
+    fechaNac:      "Fecha de nacimiento",
+    genero:        "Género",
+    telefono:      "Teléfono",
+    estado:        "Entidad federativa",
+    alcaldia:      "Alcaldía",
+    carrera:       "Carrera",
+    nombreEscuela: "Escuela de procedencia",
+    promedio:      "Promedio",
+    correo:        "Correo institucional",
+    laboratorio:   "Laboratorio",
+    horario:       "Horario",
+  };
+
   // El trigger SQL devuelve SIGNAL 45000 con texto "Cupo lleno en laboratorio"
   // o "Cupo lleno en horario". El backend traduce el SQLSTATE a HTTP 409.
   function esErrorDeCupo(status, mensaje) {
@@ -75,8 +94,14 @@
   let alumnos = [];
 
   let panelLogin, panelAdmin, tbody;
-  let modalCreate, modalEdit, modalDelete;
+  let modalCreate, modalEdit, modalDelete, modalRevision;
   let deleteTargetIndex = null;
+
+  // Datos validados que esperan confirmación final del admin en #modalAdminRevision.
+  let datosPendientes = null;
+  // Bandera para no resetear los contenedores condicionales (alcaldía / otra escuela)
+  // cuando ocultamos #modalAlumnoCreate solo de manera temporal para mostrar la revisión.
+  let isReviewing = false;
 
   document.addEventListener("DOMContentLoaded", () => {
     panelLogin = document.getElementById("panelLoginAdmin");
@@ -84,9 +109,10 @@
     tbody = document.getElementById("tablaAlumnosBody");
     if (!panelAdmin || !tbody) return;
 
-    modalCreate = new bootstrap.Modal(document.getElementById("modalAlumnoCreate"));
-    modalEdit   = new bootstrap.Modal(document.getElementById("modalAlumnoEdit"));
-    modalDelete = new bootstrap.Modal(document.getElementById("modalAlumnoDelete"));
+    modalCreate   = new bootstrap.Modal(document.getElementById("modalAlumnoCreate"));
+    modalEdit     = new bootstrap.Modal(document.getElementById("modalAlumnoEdit"));
+    modalDelete   = new bootstrap.Modal(document.getElementById("modalAlumnoDelete"));
+    modalRevision = new bootstrap.Modal(document.getElementById("modalAdminRevision"));
 
     poblarSelectsCreate();
     bindCreateEstadoAlcaldia();
@@ -94,6 +120,7 @@
     bindCreateModalReset();
     bindLoginEvents();
     bindCreateForm();
+    bindAdminRevisionForm();
     bindEditForm();
     bindDeleteModal();
     bindBuscador();
@@ -101,20 +128,26 @@
 
   // Cuando el modal de creación se cierra, devolvemos los contenedores condicionales
   // a su estado inicial (ocultos) para que el siguiente "Registrar alumno" arranque limpio.
+  // Si solo lo estamos ocultando para mostrar la revisión, conservamos el estado del formulario.
   function bindCreateModalReset() {
     const modalEl = document.getElementById("modalAlumnoCreate");
     if (!modalEl) return;
     modalEl.addEventListener("hidden.bs.modal", () => {
-      const alcContainer = document.getElementById("createAlcaldiaContainer");
-      const escContainer = document.getElementById("createOtraEscuelaContainer");
-      const alcaldia     = document.getElementById("createAlcaldia");
-      const otra         = document.getElementById("createOtraEscuela");
-
-      if (alcContainer) alcContainer.classList.add("d-none");
-      if (escContainer) escContainer.classList.add("d-none");
-      if (alcaldia) { alcaldia.disabled = true; alcaldia.required = false; alcaldia.value = ""; }
-      if (otra)     { otra.disabled = true;     otra.required = false;     otra.value = ""; }
+      if (isReviewing) return;
+      resetCreateUI();
     });
+  }
+
+  function resetCreateUI() {
+    const alcContainer = document.getElementById("createAlcaldiaContainer");
+    const escContainer = document.getElementById("createOtraEscuelaContainer");
+    const alcaldia     = document.getElementById("createAlcaldia");
+    const otra         = document.getElementById("createOtraEscuela");
+
+    if (alcContainer) alcContainer.classList.add("d-none");
+    if (escContainer) escContainer.classList.add("d-none");
+    if (alcaldia) { alcaldia.disabled = true; alcaldia.required = false; alcaldia.value = ""; }
+    if (otra)     { otra.disabled = true;     otra.required = false;     otra.value = ""; }
   }
 
   function poblarSelectsCreate() {
@@ -315,11 +348,106 @@
         return;
       }
 
+      // El POST se aplaza: primero el admin debe confirmar en #modalAdminRevision.
+      datosPendientes = nuevo;
+      transicionarARevision();
+    });
+  }
+
+  // Oculta el formulario de creación y, una vez que Bootstrap retiró el backdrop,
+  // pinta los datos en el modal de revisión y lo muestra. Así evitamos que dos
+  // backdrops se solapen y se quede uno "congelado" al cerrar el segundo.
+  function transicionarARevision() {
+    const createEl = document.getElementById("modalAlumnoCreate");
+    isReviewing = true;
+
+    const onHidden = () => {
+      createEl.removeEventListener("hidden.bs.modal", onHidden);
+      pintarRevisionAdmin(datosPendientes);
+      modalRevision.show();
+    };
+    createEl.addEventListener("hidden.bs.modal", onHidden);
+    modalCreate.hide();
+  }
+
+  // Espejo: oculta la revisión y reabre el formulario con los datos intactos.
+  function transicionarACreate() {
+    const revisionEl = document.getElementById("modalAdminRevision");
+
+    const onHidden = () => {
+      revisionEl.removeEventListener("hidden.bs.modal", onHidden);
+      modalCreate.show();
+      // El formulario ya está lleno; el flag deja de bloquear el reset normal.
+      isReviewing = false;
+    };
+    revisionEl.addEventListener("hidden.bs.modal", onHidden);
+    modalRevision.hide();
+  }
+
+  function pintarRevisionAdmin(datos) {
+    const dl = document.getElementById("adminRevisionDatos");
+    if (!dl) return;
+    dl.innerHTML = "";
+
+    Object.keys(ADMIN_REVIEW_LABELS).forEach((key) => {
+      let valor = datos[key];
+      if (key === "carrera" && CARRERAS[valor]) {
+        valor = CARRERAS[valor];
+      }
+      if (key === "alcaldia" && !valor) {
+        valor = "(no aplica)";
+      }
+
+      const dt = document.createElement("dt");
+      dt.className = "col-sm-5";
+      dt.textContent = ADMIN_REVIEW_LABELS[key];
+
+      const dd = document.createElement("dd");
+      dd.className = "col-sm-7";
+      dd.textContent = valor || "—";
+
+      dl.appendChild(dt);
+      dl.appendChild(dd);
+    });
+  }
+
+  function setConfirmarAltaLoading(loading) {
+    const btnConfirmar = document.getElementById("btnAdminConfirmarAlta");
+    const btnCorregir  = document.getElementById("btnAdminCorregir");
+    const spinner      = document.getElementById("spinnerAdminConfirmar");
+    const icon         = document.getElementById("iconAdminConfirmar");
+
+    if (btnConfirmar) btnConfirmar.disabled = loading;
+    if (btnCorregir)  btnCorregir.disabled  = loading;
+    if (spinner) spinner.classList.toggle("d-none", !loading);
+    if (icon)    icon.classList.toggle("d-none", loading);
+  }
+
+  // CURP que el botón "Imprimir Acuse Oficial" usará para descargar el PDF.
+  // Se setea sólo cuando el backend responde 200 OK.
+  let curpRegistradaAdmin = "";
+
+  function bindAdminRevisionForm() {
+    const btnCorregir  = document.getElementById("btnAdminCorregir");
+    const btnConfirmar = document.getElementById("btnAdminConfirmarAlta");
+    const btnImprimir  = document.getElementById("btnAdminImprimirAcuse");
+    const modalEl      = document.getElementById("modalAdminRevision");
+    if (!btnCorregir || !btnConfirmar || !btnImprimir || !modalEl) return;
+
+    btnCorregir.addEventListener("click", () => {
+      if (btnCorregir.disabled) return;
+      transicionarACreate();
+    });
+
+    btnConfirmar.addEventListener("click", () => {
+      if (!datosPendientes) return;
+      setConfirmarAltaLoading(true);
+
       fetch("api/admin/crear_alumno.php", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(nuevo),
+        body: JSON.stringify(datosPendientes),
       })
         .then((res) => res.json().then((body) => ({ status: res.status, body })))
         .then(({ status, body }) => {
@@ -328,13 +456,32 @@
             e.status = status;
             throw e;
           }
-          modalCreate.hide();
-          form.reset();
-          alert("¡Alumno registrado correctamente!");
+
+          // Éxito: el modal NO se cierra. Pintamos acuse, conmutamos botones
+          // y refrescamos la tabla principal en silencio.
+          setConfirmarAltaLoading(false);
+          curpRegistradaAdmin = (body.curp || datosPendientes.curp || "").toUpperCase();
+
+          pintarAcuseAsignacion(body.asignacion || null);
+
+          btnConfirmar.classList.add("d-none");
+          btnConfirmar.disabled = true;
+
+          btnCorregir.classList.add("d-none");
+          btnCorregir.disabled = true;
+
+          btnImprimir.classList.remove("d-none");
+          btnImprimir.disabled = false;
+          btnImprimir.focus();
+
+          alert(body.mensaje || "¡Alumno registrado correctamente!");
+
           cargarAlumnos();
         })
         .catch((err) => {
-          // Mantener el modal abierto para que el admin corrija lab/horario.
+          setConfirmarAltaLoading(false);
+          // En 409 dejamos abierta la revisión para que el admin pueda usar
+          // "Corregir Datos" y reasignar laboratorio/horario con cupo.
           if (esErrorDeCupo(err.status, err.message)) {
             alert(MSG_CUPO_LLENO);
             return;
@@ -342,6 +489,79 @@
           alert("Error: " + err.message);
         });
     });
+
+    btnImprimir.addEventListener("click", () => {
+      if (!curpRegistradaAdmin) {
+        alert("No se encontró la CURP para generar el PDF.");
+        return;
+      }
+      window.open(
+        `api/generarPdf.php?curp=${encodeURIComponent(curpRegistradaAdmin)}`,
+        "_blank"
+      );
+    });
+
+    // Al cerrarse el modal de revisión, restauramos el footer y el cuerpo a su
+    // estado inicial para que el siguiente alta arranque limpio. Si el cierre fue
+    // post-éxito (btnConfirmar oculto), además limpiamos el formulario de creación.
+    modalEl.addEventListener("hidden.bs.modal", () => {
+      const exitoso = btnConfirmar.classList.contains("d-none");
+
+      resetRevisionUI();
+
+      if (exitoso) {
+        const form = document.getElementById("formAlumnoCreate");
+        if (form) form.reset();
+        resetCreateUI();
+        datosPendientes = null;
+        curpRegistradaAdmin = "";
+        isReviewing = false;
+      }
+    });
+  }
+
+  function pintarAcuseAsignacion(asignacion) {
+    const acuse = document.getElementById("adminAcuseAsignacion");
+    if (!acuse) return;
+
+    if (!asignacion) {
+      acuse.classList.add("d-none");
+      acuse.innerHTML = "";
+      return;
+    }
+
+    acuse.innerHTML =
+      `<i class="bi bi-check-circle me-1 text-success"></i>` +
+      `<strong>Asignación oficial:</strong> ` +
+      `<span class="datos-examen-resaltados">${asignacion.laboratorio}</span>` +
+      ` &middot; ${asignacion.fecha} &middot; ` +
+      `<span class="datos-examen-resaltados">${asignacion.horario}</span>`;
+    acuse.classList.remove("d-none");
+  }
+
+  function resetRevisionUI() {
+    const btnCorregir  = document.getElementById("btnAdminCorregir");
+    const btnConfirmar = document.getElementById("btnAdminConfirmarAlta");
+    const btnImprimir  = document.getElementById("btnAdminImprimirAcuse");
+    const acuse        = document.getElementById("adminAcuseAsignacion");
+
+    if (btnConfirmar) {
+      btnConfirmar.classList.remove("d-none");
+      btnConfirmar.disabled = false;
+    }
+    if (btnCorregir) {
+      btnCorregir.classList.remove("d-none");
+      btnCorregir.disabled = false;
+    }
+    if (btnImprimir) {
+      btnImprimir.classList.add("d-none");
+      btnImprimir.disabled = true;
+    }
+    if (acuse) {
+      acuse.classList.add("d-none");
+      acuse.innerHTML = "";
+    }
+    setConfirmarAltaLoading(false);
   }
 
   function abrirEdicion(idx) {
