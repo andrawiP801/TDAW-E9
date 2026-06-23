@@ -132,8 +132,13 @@ try {
             ':promedio'    => $promedio,
         ]);
 
+        // Login dual: sembramos el correo institucional como usuario_login,
+        // pero el alumno también puede entrar tecleando su boleta porque
+        // login.php hace LEFT JOIN ALUMNO ON curp y compara contra a.boleta.
+        $correoSeed = $boleta . '@alumno.ipn.mx';
+
         $stmtUsr->execute([
-            ':login' => $boleta,
+            ':login' => $correoSeed,
             ':hash'  => password_hash('alumno123', PASSWORD_BCRYPT),
             ':curp'  => $curp,
         ]);
@@ -194,9 +199,16 @@ $resumen = $pdo->query("
 
   <h3>Credenciales sembradas</h3>
   <table>
-    <tr><th>Rol</th><th>usuario_login</th><th>Contraseña en claro</th></tr>
+    <tr><th>Rol</th><th>Login (correo o boleta)</th><th>Contraseña en claro</th></tr>
     <tr><td>Administrador</td><td><code>admin</code></td><td><code>admin</code></td></tr>
-    <tr><td>Alumnos (25)</td><td><code>2026630001</code> … <code>2026630025</code></td><td><code>alumno123</code></td></tr>
+    <tr>
+      <td>Alumnos (25)</td>
+      <td>
+        <code>2026630001@alumno.ipn.mx</code> … <code>2026630025@alumno.ipn.mx</code><br>
+        <em>o</em> boleta <code>2026630001</code> … <code>2026630025</code>
+      </td>
+      <td><code>alumno123</code></td>
+    </tr>
   </table>
 
   <h3>Distribución en Horario 1 (11:00 — 12:30)</h3>

@@ -164,6 +164,12 @@ main { flex: 1 0 auto; }
 }
 .review-list dd { word-break: break-word; }
 
+/* Modal de creación de alumno: refuerzo del scroll vertical cuando el modal
+   se expande a tamaño 'modal-xl' con todos los campos visibles. Esto blinda
+   el comportamiento ante cualquier estilo heredado que cancele el overflow. */
+#modalAlumnoCreate .modal-content { max-height: 85vh !important; }
+#modalAlumnoCreate .modal-body    { overflow-y: auto !important; }
+
 /* --- Misceláneos --------------------------------------------------------- */
 .required-mark { color: var(--ipn-guinda); font-weight: bold; }
 

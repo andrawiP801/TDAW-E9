@@ -24,6 +24,10 @@ if ($captchaA < 1 || $captchaA > 9 || $captchaB < 1 || $captchaB > 9
 }
 
 try {
+    // Login dual: el campo "usuario_login" en USUARIO almacena el correo institucional
+    // (o "admin" para el administrador). El LEFT JOIN con ALUMNO permite que el alumno
+    // también ingrese tecleando su boleta (ALUMNO.boleta). El binding es por nombre,
+    // así que un mismo :login se compara en ambas columnas en una única ejecución.
     $sql = "
         SELECT u.id_usuario, u.usuario_login, u.contrasena, u.tipo_usuario, u.curp
         FROM USUARIO u

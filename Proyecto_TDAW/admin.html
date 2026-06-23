@@ -137,124 +137,137 @@
   <!-- ================== Modal: Registrar Alumno (Create) ================== -->
   <div class="modal fade" id="modalAlumnoCreate" tabindex="-1"
        aria-labelledby="modalAlumnoCreateLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-      <div class="modal-content">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+      <form id="formAlumnoCreate" class="modal-content" novalidate>
         <div class="modal-header modal-ipn">
           <h1 class="modal-title fs-5" id="modalAlumnoCreateLabel">
             <i class="bi bi-person-plus me-2"></i>Registrar Alumno
           </h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
-        <form id="formAlumnoCreate" novalidate>
-          <div class="modal-body">
+        <div class="modal-body">
 
-            <h6 class="text-uppercase text-muted small mb-2">Identidad</h6>
-            <div class="row g-3 mb-3">
-              <div class="col-md-4">
-                <label for="createCurp" class="form-label">CURP <span class="required-mark">*</span></label>
-                <input type="text" class="form-control text-uppercase" id="createCurp" maxlength="18" required>
-              </div>
-              <div class="col-md-4">
-                <label for="createBoleta" class="form-label">Boleta <span class="required-mark">*</span></label>
-                <input type="text" class="form-control text-uppercase" id="createBoleta" maxlength="10" required>
-              </div>
-              <div class="col-md-4">
-                <label for="createNombre" class="form-label">Nombre completo <span class="required-mark">*</span></label>
-                <input type="text" class="form-control" id="createNombre" required>
-              </div>
-              <div class="col-md-4">
-                <label for="createFechaNac" class="form-label">Fecha de nacimiento <span class="required-mark">*</span></label>
-                <input type="date" class="form-control" id="createFechaNac" required>
-              </div>
-              <div class="col-md-4">
-                <label for="createGenero" class="form-label">Género <span class="required-mark">*</span></label>
-                <select class="form-select" id="createGenero" required>
-                  <option value="">Selecciona…</option>
-                  <option value="Femenino">Femenino</option>
-                  <option value="Masculino">Masculino</option>
-                  <option value="Otro">Otro</option>
-                  <option value="Prefiero no decir">Prefiero no decir</option>
-                </select>
-              </div>
-              <div class="col-md-4">
-                <label for="createTelefono" class="form-label">Teléfono <span class="required-mark">*</span></label>
-                <input type="tel" class="form-control" id="createTelefono" maxlength="10" placeholder="5512345678" required>
+          <h6 class="text-uppercase text-muted small mb-2">Identidad</h6>
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <label for="createCurp" class="form-label">CURP <span class="required-mark">*</span></label>
+              <input type="text" class="form-control text-uppercase" id="createCurp" maxlength="18" required>
+            </div>
+            <div class="col-md-4">
+              <label for="createBoleta" class="form-label">Boleta <span class="required-mark">*</span></label>
+              <input type="text" class="form-control text-uppercase" id="createBoleta" maxlength="10" required>
+            </div>
+            <div class="col-md-4">
+              <label for="createNombre" class="form-label">Nombre completo <span class="required-mark">*</span></label>
+              <input type="text" class="form-control" id="createNombre" required>
+            </div>
+            <div class="col-md-4">
+              <label for="createFechaNac" class="form-label">Fecha de nacimiento <span class="required-mark">*</span></label>
+              <input type="date" class="form-control" id="createFechaNac" required>
+            </div>
+            <div class="col-md-4">
+              <span class="form-label d-block">Género <span class="required-mark">*</span></span>
+              <div id="createGeneroGroup" class="genero-group d-flex flex-wrap column-gap-3 row-gap-1 pt-1">
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio"
+                         name="createGenero" id="createGeneroF" value="Femenino" required>
+                  <label class="form-check-label" for="createGeneroF">Femenino</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio"
+                         name="createGenero" id="createGeneroM" value="Masculino" required>
+                  <label class="form-check-label" for="createGeneroM">Masculino</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio"
+                         name="createGenero" id="createGeneroO" value="Otro" required>
+                  <label class="form-check-label" for="createGeneroO">Otro</label>
+                </div>
               </div>
             </div>
-
-            <h6 class="text-uppercase text-muted small mb-2">Procedencia y carrera</h6>
-            <div class="row g-3 mb-3">
-              <div class="col-md-4">
-                <label for="createEstado" class="form-label">Entidad federativa <span class="required-mark">*</span></label>
-                <input type="text" class="form-control" id="createEstado" placeholder="Ciudad de México" required>
-              </div>
-              <div class="col-md-4">
-                <label for="createAlcaldia" class="form-label">
-                  Alcaldía <span class="text-muted small">(solo CDMX)</span>
-                </label>
-                <input type="text" class="form-control" id="createAlcaldia" placeholder="Gustavo A. Madero">
-              </div>
-              <div class="col-md-4">
-                <label for="createCarrera" class="form-label">Carrera <span class="required-mark">*</span></label>
-                <select class="form-select" id="createCarrera" required>
-                  <option value="">Selecciona…</option>
-                  <option value="ISC">Ing. en Sistemas Computacionales</option>
-                  <option value="LCD">Lic. en Ciencia de Datos</option>
-                  <option value="IIA">Ing. en Inteligencia Artificial</option>
-                </select>
-              </div>
-              <div class="col-md-8">
-                <label for="createEscuela" class="form-label">Escuela de procedencia <span class="required-mark">*</span></label>
-                <input type="text" class="form-control" id="createEscuela" placeholder='CECyT 9 "Juan de Dios Bátiz"' required>
-              </div>
-              <div class="col-md-4">
-                <label for="createPromedio" class="form-label">Promedio <span class="required-mark">*</span></label>
-                <input type="number" class="form-control" id="createPromedio" step="0.01" min="6.0" max="10.0" placeholder="8.5" required>
-              </div>
-            </div>
-
-            <h6 class="text-uppercase text-muted small mb-2">Cuenta y asignación</h6>
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label for="createCorreo" class="form-label">Correo institucional <span class="required-mark">*</span></label>
-                <input type="email" class="form-control" id="createCorreo" placeholder="usuario@alumno.ipn.mx" required>
-              </div>
-              <div class="col-md-6">
-                <label for="createPassword" class="form-label">Contraseña <span class="required-mark">*</span></label>
-                <input type="text" class="form-control" id="createPassword" placeholder="Mín. 6, una mayúscula, dígito y especial" required>
-              </div>
-              <div class="col-md-6">
-                <label for="createLab" class="form-label">Laboratorio <span class="required-mark">*</span></label>
-                <select class="form-select" id="createLab" required>
-                  <option value="">—</option>
-                  <option value="Lab 1">Lab 1</option>
-                  <option value="Lab 2">Lab 2</option>
-                  <option value="Lab 3">Lab 3</option>
-                  <option value="Lab 4">Lab 4</option>
-                  <option value="Lab 5">Lab 5</option>
-                </select>
-              </div>
-              <div class="col-md-6">
-                <label for="createHorario" class="form-label">Horario <span class="required-mark">*</span></label>
-                <select class="form-select" id="createHorario" required>
-                  <option value="">—</option>
-                  <option value="11:00 - 12:30">Turno 1 (11:00 - 12:30)</option>
-                  <option value="12:45 - 14:15">Turno 2 (12:45 - 14:15)</option>
-                  <option value="14:30 - 16:00">Turno 3 (14:30 - 16:00)</option>
-                </select>
-              </div>
+            <div class="col-md-4">
+              <label for="createTelefono" class="form-label">Teléfono <span class="required-mark">*</span></label>
+              <input type="tel" class="form-control" id="createTelefono" maxlength="10" placeholder="5512345678" required>
             </div>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-              <i class="bi bi-x-lg me-1"></i>Cancelar
-            </button>
-            <button type="submit" class="btn btn-ipn">
-              <i class="bi bi-check-lg me-1"></i>Guardar alumno
-            </button>
+
+          <h6 class="text-uppercase text-muted small mb-2">Procedencia y carrera</h6>
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <label for="createEstado" class="form-label">Entidad federativa <span class="required-mark">*</span></label>
+              <select class="form-select" id="createEstado" required>
+                <option value="">Selecciona un estado…</option>
+              </select>
+            </div>
+            <div class="col-md-4 d-none" id="createAlcaldiaContainer">
+              <label for="createAlcaldia" class="form-label">
+                Alcaldía <span class="required-mark">*</span>
+                <span class="text-muted small">(solo CDMX)</span>
+              </label>
+              <select class="form-select" id="createAlcaldia" disabled>
+                <option value="">Selecciona una alcaldía…</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="createCarrera" class="form-label">Carrera <span class="required-mark">*</span></label>
+              <select class="form-select" id="createCarrera" required>
+                <option value="">Selecciona…</option>
+              </select>
+            </div>
+            <div class="col-md-8">
+              <label for="createEscuela" class="form-label">Escuela de procedencia <span class="required-mark">*</span></label>
+              <select class="form-select" id="createEscuela" required>
+                <option value="">Selecciona…</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="createPromedio" class="form-label">Promedio <span class="required-mark">*</span></label>
+              <input type="number" class="form-control" id="createPromedio" step="0.01" min="6.0" max="10.0" placeholder="8.5" required>
+            </div>
+            <div class="col-md-8 d-none" id="createOtraEscuelaContainer">
+              <label for="createOtraEscuela" class="form-label">
+                Nombre de la escuela <span class="required-mark">*</span>
+                <span class="text-muted small">(solo si seleccionaste "Otro")</span>
+              </label>
+              <input type="text" class="form-control" id="createOtraEscuela"
+                     placeholder="Captura el nombre completo de la escuela" disabled>
+            </div>
           </div>
-        </form>
-      </div>
+
+          <h6 class="text-uppercase text-muted small mb-2">Cuenta y asignación</h6>
+          <div class="alert alert-info py-2 small mb-3" role="alert">
+            <i class="bi bi-info-circle me-1"></i>
+            La contraseña inicial del alumno será su <strong>número de boleta</strong>.
+            Podrá iniciar sesión con su boleta o su correo institucional.
+          </div>
+          <div class="row g-3">
+            <div class="col-md-12">
+              <label for="createCorreo" class="form-label">Correo institucional <span class="required-mark">*</span></label>
+              <input type="email" class="form-control" id="createCorreo" placeholder="usuario@alumno.ipn.mx" required>
+            </div>
+            <div class="col-md-6">
+              <label for="createLab" class="form-label">Laboratorio <span class="required-mark">*</span></label>
+              <select class="form-select" id="createLab" required>
+                <option value="">Selecciona un laboratorio…</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="createHorario" class="form-label">Horario <span class="required-mark">*</span></label>
+              <select class="form-select" id="createHorario" required>
+                <option value="">Selecciona un turno…</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            <i class="bi bi-x-lg me-1"></i>Cancelar
+          </button>
+          <button type="submit" class="btn btn-ipn">
+            <i class="bi bi-check-lg me-1"></i>Guardar alumno
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 

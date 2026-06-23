@@ -7,6 +7,71 @@
     IIA: "Ing. en Inteligencia Artificial",
   };
 
+  const ESTADOS_MX = [
+    "Aguascalientes", "Baja California", "Baja California Sur", "Campeche",
+    "Chiapas", "Chihuahua", "Ciudad de México", "Coahuila", "Colima", "Durango",
+    "Estado de México", "Guanajuato", "Guerrero", "Hidalgo", "Jalisco",
+    "Michoacán", "Morelos", "Nayarit", "Nuevo León", "Oaxaca", "Puebla",
+    "Querétaro", "Quintana Roo", "San Luis Potosí", "Sinaloa", "Sonora",
+    "Tabasco", "Tamaulipas", "Tlaxcala", "Veracruz", "Yucatán", "Zacatecas",
+  ];
+
+  const ALCALDIAS_CDMX = [
+    "Álvaro Obregón", "Azcapotzalco", "Benito Juárez", "Coyoacán",
+    "Cuajimalpa de Morelos", "Cuauhtémoc", "Gustavo A. Madero", "Iztacalco",
+    "Iztapalapa", "La Magdalena Contreras", "Miguel Hidalgo", "Milpa Alta",
+    "Tláhuac", "Tlalpan", "Venustiano Carranza", "Xochimilco",
+  ];
+
+  // Cada entrada tiene "value" (lo que se manda al backend) y "nombre" (lo que ve el admin).
+  // "Otro" abre el campo de texto libre createOtraEscuela.
+  const ESCUELAS_PROCEDENCIA = [
+    { value: 'CECyT 1 "Gonzalo Vázquez Vela"',         nombre: 'CECyT 1 "Gonzalo Vázquez Vela"' },
+    { value: 'CECyT 2 "Miguel Bernard"',               nombre: 'CECyT 2 "Miguel Bernard"' },
+    { value: 'CECyT 3 "Estanislao Ramírez Ruiz"',      nombre: 'CECyT 3 "Estanislao Ramírez Ruiz"' },
+    { value: 'CECyT 4 "Lázaro Cárdenas"',              nombre: 'CECyT 4 "Lázaro Cárdenas"' },
+    { value: 'CECyT 5 "Benito Juárez"',                nombre: 'CECyT 5 "Benito Juárez"' },
+    { value: 'CECyT 6 "Miguel Othón de Mendizábal"',   nombre: 'CECyT 6 "Miguel Othón de Mendizábal"' },
+    { value: 'CECyT 7 "Cuauhtémoc"',                   nombre: 'CECyT 7 "Cuauhtémoc"' },
+    { value: 'CECyT 8 "Narciso Bassols García"',       nombre: 'CECyT 8 "Narciso Bassols García"' },
+    { value: 'CECyT 9 "Juan de Dios Bátiz"',           nombre: 'CECyT 9 "Juan de Dios Bátiz"' },
+    { value: 'CECyT 10 "Carlos Vallejo Márquez"',      nombre: 'CECyT 10 "Carlos Vallejo Márquez"' },
+    { value: 'CECyT 11 "Wilfrido Massieu Pérez"',      nombre: 'CECyT 11 "Wilfrido Massieu Pérez"' },
+    { value: 'CECyT 12 "José María Morelos y Pavón"',  nombre: 'CECyT 12 "José María Morelos y Pavón"' },
+    { value: 'CECyT 13 "Ricardo Flores Magón"',        nombre: 'CECyT 13 "Ricardo Flores Magón"' },
+    { value: 'CECyT 14 "Luis Enrique Erro"',           nombre: 'CECyT 14 "Luis Enrique Erro"' },
+    { value: 'CECyT 15 "Diódoro Antúnez Echegaray"',   nombre: 'CECyT 15 "Diódoro Antúnez Echegaray"' },
+    { value: 'CECyT 16 "Hidalgo"',                     nombre: 'CECyT 16 "Hidalgo"' },
+    { value: 'CET 1 "Walter Cross Buchanan"',          nombre: 'CET 1 "Walter Cross Buchanan"' },
+    { value: 'Otro',                                   nombre: 'Otro (especificar)' },
+  ];
+
+  const CARRERAS_LIST = [
+    { value: "ISC", nombre: "Ing. en Sistemas Computacionales" },
+    { value: "LCD", nombre: "Lic. en Ciencia de Datos" },
+    { value: "IIA", nombre: "Ing. en Inteligencia Artificial" },
+  ];
+
+  const LABORATORIOS_LIST = ["Lab 1", "Lab 2", "Lab 3", "Lab 4", "Lab 5"];
+
+  const HORARIOS_LIST = [
+    { value: "11:00 - 12:30", nombre: "Turno 1 (11:00 - 12:30)" },
+    { value: "12:45 - 14:15", nombre: "Turno 2 (12:45 - 14:15)" },
+    { value: "14:30 - 16:00", nombre: "Turno 3 (14:30 - 16:00)" },
+  ];
+
+  const MSG_CUPO_LLENO =
+    "Error: El laboratorio o el horario seleccionado ya se encuentra al límite de su capacidad (30 por salón / 150 por turno). Elige otra combinación.";
+
+  // El trigger SQL devuelve SIGNAL 45000 con texto "Cupo lleno en laboratorio"
+  // o "Cupo lleno en horario". El backend traduce el SQLSTATE a HTTP 409.
+  function esErrorDeCupo(status, mensaje) {
+    if (status === 409 && typeof mensaje === "string" && /cupo/i.test(mensaje)) {
+      return true;
+    }
+    return false;
+  }
+
   let alumnos = [];
 
   let panelLogin, panelAdmin, tbody;
@@ -23,12 +88,103 @@
     modalEdit   = new bootstrap.Modal(document.getElementById("modalAlumnoEdit"));
     modalDelete = new bootstrap.Modal(document.getElementById("modalAlumnoDelete"));
 
+    poblarSelectsCreate();
+    bindCreateEstadoAlcaldia();
+    bindCreateEscuelaOtro();
+    bindCreateModalReset();
     bindLoginEvents();
     bindCreateForm();
     bindEditForm();
     bindDeleteModal();
     bindBuscador();
   });
+
+  // Cuando el modal de creación se cierra, devolvemos los contenedores condicionales
+  // a su estado inicial (ocultos) para que el siguiente "Registrar alumno" arranque limpio.
+  function bindCreateModalReset() {
+    const modalEl = document.getElementById("modalAlumnoCreate");
+    if (!modalEl) return;
+    modalEl.addEventListener("hidden.bs.modal", () => {
+      const alcContainer = document.getElementById("createAlcaldiaContainer");
+      const escContainer = document.getElementById("createOtraEscuelaContainer");
+      const alcaldia     = document.getElementById("createAlcaldia");
+      const otra         = document.getElementById("createOtraEscuela");
+
+      if (alcContainer) alcContainer.classList.add("d-none");
+      if (escContainer) escContainer.classList.add("d-none");
+      if (alcaldia) { alcaldia.disabled = true; alcaldia.required = false; alcaldia.value = ""; }
+      if (otra)     { otra.disabled = true;     otra.required = false;     otra.value = ""; }
+    });
+  }
+
+  function poblarSelectsCreate() {
+    appendOptions("createEstado",   ESTADOS_MX);
+    appendOptions("createAlcaldia", ALCALDIAS_CDMX);
+    appendOptions("createEscuela",  ESCUELAS_PROCEDENCIA);
+    appendOptions("createCarrera",  CARRERAS_LIST);
+    appendOptions("createLab",      LABORATORIOS_LIST);
+    appendOptions("createHorario",  HORARIOS_LIST);
+  }
+
+  // Acepta arreglos de strings o de objetos {value, nombre}. Idempotente:
+  // conserva el primer <option> (placeholder) ya escrito en el HTML.
+  function appendOptions(selectId, items) {
+    const select = document.getElementById(selectId);
+    if (!select) return;
+    items.forEach((item) => {
+      const opt = document.createElement("option");
+      if (typeof item === "string") {
+        opt.value = item;
+        opt.textContent = item;
+      } else {
+        opt.value = item.value;
+        opt.textContent = item.nombre;
+      }
+      select.appendChild(opt);
+    });
+  }
+
+  function bindCreateEstadoAlcaldia() {
+    const estado     = document.getElementById("createEstado");
+    const alcaldia   = document.getElementById("createAlcaldia");
+    const contenedor = document.getElementById("createAlcaldiaContainer");
+    if (!estado || !alcaldia || !contenedor) return;
+
+    estado.addEventListener("change", () => {
+      if (estado.value === "Ciudad de México") {
+        contenedor.classList.remove("d-none");
+        alcaldia.disabled = false;
+        alcaldia.required = true;
+      } else {
+        contenedor.classList.add("d-none");
+        alcaldia.disabled = true;
+        alcaldia.required = false;
+        alcaldia.value = "";
+      }
+    });
+  }
+
+  function bindCreateEscuelaOtro() {
+    const escuela    = document.getElementById("createEscuela");
+    const otra       = document.getElementById("createOtraEscuela");
+    const contenedor = document.getElementById("createOtraEscuelaContainer");
+    if (!escuela || !otra || !contenedor) return;
+
+    escuela.addEventListener("change", () => {
+      if (escuela.value === "Otro") {
+        contenedor.classList.remove("d-none");
+        otra.disabled = false;
+        otra.required = true;
+        otra.value = "";
+        otra.focus();
+      } else {
+        contenedor.classList.add("d-none");
+        otra.disabled = true;
+        otra.required = false;
+        otra.value = "";
+      }
+    });
+  }
 
   function bindLoginEvents() {
     document.addEventListener("admin:login-success", () => {
@@ -118,21 +274,31 @@
       e.preventDefault();
 
       const get = (id) => (document.getElementById(id).value || "").trim();
+      const generoSel = document.querySelector('input[name="createGenero"]:checked');
+
+      // Si la escuela elegida es "Otro", el nombre real lo escribe el admin en
+      // #createOtraEscuela. En cualquier otro caso, mandamos el valor del catálogo.
+      const escuelaSel = get("createEscuela");
+      const nombreEscuela =
+        escuelaSel === "Otro" ? get("createOtraEscuela") : escuelaSel;
+
+      // La alcaldía solo aplica si el estado es CDMX. Cualquier otra cosa va vacía.
+      const estadoSel = get("createEstado");
+      const alcaldia  = estadoSel === "Ciudad de México" ? get("createAlcaldia") : "";
 
       const nuevo = {
         curp:          get("createCurp").toUpperCase(),
         boleta:        get("createBoleta").toUpperCase(),
         nombre:        get("createNombre"),
         fechaNac:      get("createFechaNac"),
-        genero:        get("createGenero"),
+        genero:        generoSel ? generoSel.value : "",
         telefono:      get("createTelefono"),
-        estado:        get("createEstado"),
-        alcaldia:      get("createAlcaldia"),
+        estado:        estadoSel,
+        alcaldia:      alcaldia,
         carrera:       get("createCarrera"),
-        nombreEscuela: get("createEscuela"),
+        nombreEscuela: nombreEscuela,
         promedio:      get("createPromedio"),
         correo:        get("createCorreo"),
-        password:      get("createPassword"),
         laboratorio:   get("createLab"),
         horario:       get("createHorario"),
       };
@@ -140,8 +306,9 @@
       const obligatorios = [
         "curp", "boleta", "nombre", "fechaNac", "genero", "telefono",
         "estado", "carrera", "nombreEscuela", "promedio", "correo",
-        "password", "laboratorio", "horario",
+        "laboratorio", "horario",
       ];
+      if (estadoSel === "Ciudad de México") obligatorios.push("alcaldia");
       const faltantes = obligatorios.filter((k) => !nuevo[k]);
       if (faltantes.length) {
         alert("Completa todos los campos obligatorios: " + faltantes.join(", "));
@@ -157,14 +324,23 @@
         .then((res) => res.json().then((body) => ({ status: res.status, body })))
         .then(({ status, body }) => {
           if (status !== 200 || !body.ok) {
-            throw new Error(body.mensaje || "No se pudo registrar al alumno.");
+            const e = new Error(body.mensaje || "No se pudo registrar al alumno.");
+            e.status = status;
+            throw e;
           }
           modalCreate.hide();
           form.reset();
           alert("¡Alumno registrado correctamente!");
           cargarAlumnos();
         })
-        .catch((err) => alert("Error: " + err.message));
+        .catch((err) => {
+          // Mantener el modal abierto para que el admin corrija lab/horario.
+          if (esErrorDeCupo(err.status, err.message)) {
+            alert(MSG_CUPO_LLENO);
+            return;
+          }
+          alert("Error: " + err.message);
+        });
     });
   }
 
@@ -214,13 +390,23 @@
         .then((res) => res.json().then((body) => ({ status: res.status, body })))
         .then(({ status, body }) => {
           if (status !== 200 || !body.ok) {
-            throw new Error(body.mensaje || "No se pudo actualizar.");
+            const e = new Error(body.mensaje || "No se pudo actualizar.");
+            e.status = status;
+            throw e;
           }
           modalEdit.hide();
           alert("¡Cambios guardados correctamente!");
           cargarAlumnos();
         })
-        .catch((err) => alert("Error: " + err.message));
+        .catch((err) => {
+          // Mantener el modal de edición abierto para que el admin
+          // pueda reasignar a otro laboratorio/horario con cupo.
+          if (esErrorDeCupo(err.status, err.message)) {
+            alert(MSG_CUPO_LLENO);
+            return;
+          }
+          alert("Error: " + err.message);
+        });
     });
   }
 

@@ -132,12 +132,15 @@
   function bindEstadoAlcaldia() {
     const estado = document.getElementById("estado");
     const alcaldia = document.getElementById("alcaldia");
+    const contenedor = document.getElementById("alcaldiaContainer");
 
     estado.addEventListener("change", () => {
       if (estado.value === "Ciudad de México") {
+        contenedor.classList.remove("d-none");
         alcaldia.disabled = false;
         alcaldia.required = true;
       } else {
+        contenedor.classList.add("d-none");
         alcaldia.disabled = true;
         alcaldia.required = false;
         alcaldia.value = "";
@@ -149,11 +152,13 @@
   function bindEscuelaToggle() {
     const escuela = document.getElementById("escuela");
     const nombreEsc = document.getElementById("nombreEscuela");
+    const contenedor = document.getElementById("nombreEscuelaContainer");
 
     escuela.addEventListener("change", () => {
       const v = escuela.value;
 
       if (v === "Otro") {
+        contenedor.classList.remove("d-none");
         nombreEsc.disabled = false;
         nombreEsc.required = true;
         nombreEsc.value = "";
@@ -161,11 +166,13 @@
         nombreEsc.focus();
       } else if (v) {
         const item = ESCUELAS_PROCEDENCIA.find((e) => e.value === v);
+        contenedor.classList.add("d-none");
         nombreEsc.value = item ? item.nombre : "";
         nombreEsc.disabled = true;
         nombreEsc.required = false;
         nombreEsc.classList.remove("is-invalid", "is-valid");
       } else {
+        contenedor.classList.add("d-none");
         nombreEsc.disabled = true;
         nombreEsc.required = false;
         nombreEsc.value = "";
@@ -183,12 +190,18 @@
         );
         const generoFeedback = document.getElementById("generoFeedback");
         if (generoFeedback) generoFeedback.classList.remove("d-block");
+
         const nombreEsc = document.getElementById("nombreEscuela");
         nombreEsc.disabled = true;
         nombreEsc.required = false;
+        const escContainer = document.getElementById("nombreEscuelaContainer");
+        if (escContainer) escContainer.classList.add("d-none");
+
         const alcaldia = document.getElementById("alcaldia");
         alcaldia.disabled = true;
         alcaldia.required = false;
+        const alcContainer = document.getElementById("alcaldiaContainer");
+        if (alcContainer) alcContainer.classList.add("d-none");
       }, 0);
     });
   }

@@ -120,9 +120,9 @@
             <div class="invalid-feedback">Selecciona una entidad.</div>
           </div>
 
-          <div class="col-md-6">
+          <div class="col-md-6 d-none" id="alcaldiaContainer">
             <label for="alcaldia" class="form-label">
-              Alcaldía
+              Alcaldía <span class="required-mark">*</span>
               <span class="text-muted small">(solo si la entidad es Ciudad de México)</span>
             </label>
             <select class="form-select" id="alcaldia" name="alcaldia" disabled>
@@ -161,9 +161,9 @@
             <div class="invalid-feedback">Selecciona una opción.</div>
           </div>
 
-          <div class="col-md-6">
+          <div class="col-md-6 d-none" id="nombreEscuelaContainer">
             <label for="nombreEscuela" class="form-label">
-              Nombre de la escuela
+              Nombre de la escuela <span class="required-mark">*</span>
               <span class="text-muted small">(solo si seleccionas "Otro")</span>
             </label>
             <input type="text" class="form-control"

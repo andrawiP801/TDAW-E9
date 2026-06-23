@@ -20,15 +20,19 @@ $carrera  =          trim((string)($data['carrera']       ?? ''));
 $escuela  =          trim((string)($data['nombreEscuela'] ?? ($data['escuela'] ?? '')));
 $promedio =          trim((string)($data['promedio']      ?? ''));
 $correo   =          trim((string)($data['correo']        ?? ''));
-$password =                 (string)($data['password']    ?? '');
 $laboratorio = trim((string)($data['laboratorio'] ?? ''));
 $horario     = trim((string)($data['horario']     ?? ''));
+
+// Política de creación desde el panel admin:
+// la contraseña inicial del alumno es su propio número de boleta.
+// El alumno puede cambiarla más adelante; aquí no se pide al administrador.
+$password = $boleta;
 
 $obligatorios = [
     'curp' => $curp, 'boleta' => $boleta, 'nombre' => $nombre,
     'fechaNac' => $fechaNac, 'genero' => $genero, 'telefono' => $telefono,
     'estado' => $estado, 'carrera' => $carrera, 'escuela' => $escuela,
-    'promedio' => $promedio, 'correo' => $correo, 'password' => $password,
+    'promedio' => $promedio, 'correo' => $correo,
     'laboratorio' => $laboratorio, 'horario' => $horario,
 ];
 foreach ($obligatorios as $campo => $valor) {
